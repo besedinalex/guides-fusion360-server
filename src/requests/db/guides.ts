@@ -15,6 +15,22 @@ export function selectGuides(): Promise<Guide[]> {
     });
 }
 
+export function selectGuideImage(guideId: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const sql =
+        `SELECT Guides.imageName
+        FROM Guides
+        WHERE Guides.id = ${guideId}`;
+        db.all(sql, [], (err, rows: Guide) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows[0].imageName);
+            }
+        });
+    });
+}
+
 export function selectPartGuides(guideId: number): Promise<PartGuide[]> {
     return new Promise((resolve, reject) => {
         const sql =
