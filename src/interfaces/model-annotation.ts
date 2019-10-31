@@ -1,5 +1,4 @@
-export default interface ModelAnnotations {
-    guideId: number;
+export default interface ModelAnnotation {
     x: number;
     y: number;
     z: number;
