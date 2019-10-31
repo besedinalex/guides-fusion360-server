@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import {getGuides, getPartGuides} from "./requests/http/guides";
+import {getGuideImg, getGuides, getPartGuides} from "./requests/http/guides";
 
 const app = express();
 
@@ -17,6 +17,10 @@ app.listen(4000, () => console.log('Server is started.'));
 
 app.get('/home', function (req, res) {
     getGuides(res);
+});
+
+app.get('/guide-img', function (req, res) {
+    getGuideImg(req.query.guideId, res);
 });
 
 app.get('/guide', function (req, res) {
