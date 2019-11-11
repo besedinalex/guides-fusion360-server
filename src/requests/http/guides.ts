@@ -2,14 +2,20 @@ import {selectGuideImage, selectGuides, selectPartGuides} from "../db/guides";
 import Guide from "../../interfaces/guide";
 import PartGuide from "../../interfaces/part-guide";
 
-export function getGuides(res) {
+import express from 'express';
+
+const guide = express.Router();
+
+guide.get('/all', function (req, res) {
     selectGuides().then((data: Guide[]) => res.json(data));
-}
+});
 
-export function getGuideImg(guideId: number, res) {
-    selectGuideImage(guideId).then((data: string) => res.json(data));
-}
+guide.get('/img', function (req, res) {
+    selectGuideImage(req.query.guideId).then((data: string) => res.json(data));
+});
 
-export function getPartGuides(guideId: number, res) {
-    selectPartGuides(guideId).then((data: PartGuide[]) => res.json(data));
-}
+guide.get('/parts', function (req, res) {
+    selectPartGuides(req.query.guideId).then((data: PartGuide[]) => res.json(data));
+});
+
+export default guide;
