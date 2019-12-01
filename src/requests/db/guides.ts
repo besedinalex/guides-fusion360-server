@@ -34,9 +34,10 @@ export function selectGuideImage(guideId: number): Promise<string> {
 export function selectPartGuides(guideId: number): Promise<PartGuide[]> {
     return new Promise((resolve, reject) => {
         const sql =
-        `SELECT PartGuide.name, PartGuide.content, PartGuide.sortKey
+        `SELECT PartGuide.name, PartGuide.content
         FROM PartGuide
-        WHERE PartGuide.guideId = ${guideId}`;
+        WHERE PartGuide.guideId = ${guideId}
+        ORDER BY PartGuide.sortKey ASC`;
         db.all(sql, [], (err, rows: PartGuide[]) => {
             if (err) {
                 reject(err);
