@@ -1,6 +1,5 @@
 import db from './main';
 import {encrypt} from '../../crypto';
-import User from '../../interfaces/user';
 
 export function signUp(email: string, firstName: string, lastName: string, group: string, password: string): Promise<number> {
     return new Promise((resolve, reject) => {
@@ -33,7 +32,7 @@ export function signIn(email: string, password: string): Promise<number> {
                 reject(err);
             } else {
                 console.log(rows[0]);
-                resolve(rows[0]);
+                resolve(rows[0].id);
             }
         });
     });
