@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import guide from "./requests/http/guides";
+import guide from './requests/http/guides';
+import annotations from "./requests/http/model-annotations";
 
 const app = express();
 
 app.use(cors());
 app.use('/guide', guide);
+app.use('/annotations', annotations);
 app.use('/images', express.static(projectFolderPath() + '/assets/images'));
 app.use('/models', express.static(projectFolderPath() + '/assets/models'));
 
