@@ -1,55 +1,56 @@
-const jwt = require('jsonwebtoken');
-const userData = require('../db/user');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import {signUp, signIn} from '../db/user';
 
+const user = express.Router();
 const secret = 'Tolstikoff';
 
-// exports.checkToken = function (req, res, next) {
-//     const token = req.query.token;
-//     if (!token) {
-//         res.status(401).send('Unauthorized: No token provided');
-//     } else {
-//         jwt.verify(token, secret, function (err, decoded) {
-//             if (err) {
-//                 res.status(401).send('Unauthorized: Invalid token');
-//             } else if (Date.now() >= decoded.exp * 1000) {
-//                 res.status(401).send('Unauthorized: Token expired');
-//             } else {
-//                 req.user_id = decoded.id;
-//                 next();
-//             }
-//         });
-//     }
-// };
-
-exports.signInUser = function (email, password, res) {
-    userData.signIn(email, password)
-        .then(data => {
-            const payload = {id: data.user_id};
-            const token = jwt.sign(payload, secret, {expiresIn: '365d'});
-            let expiresAt = Date.now() + +365 * 24 * 60 * 60 * 1000;
-            res.json({token, expiresAt: expiresAt, userId: data.user_id});
-            // TODO: Хранить токены в БД.
-            // TODO: Дать юзеру возможность дропнуть токены.
-            // TODO: Выдавать токен на несколько дней/месяцев в зависимости от галочки в поле "запомнить меня".
+user.get('/token', (req, res) => {
+    signIn(req.query.email, req.query.email)
+        .then(id => {
+            const payload = {id: id};
+            const token = jwt.sign(payload, secret, {expiresIn: '30d'});
+            let expiresAt = Date.now() + +30 * 24 * 60 * 60 * 1000;
+            res.json({token: token, expiresAt: expiresAt});
         })
         .catch(err => res.status(401).send(err.message));
-};
+});
 
-exports.signUpUser = function (firstName, lastName, email, password, res) {
-    userData.signUp(firstName, lastName, email.toLowerCase(), password)
+user.post('/new', (req, res) => {
+    if (req.query.inviteCode !== 'MosPolytechRules') {
+        res.status(401).send('Unauthorized: Invalid invite code');
+        return;
+    }
+    const email = req.query.email;
+    const firstName = req.query.firstName;
+    const lastName = req.query.lastName;
+    const group = req.query.group;
+    const password = req.query.password;
+    signUp(email.toLowerCase(), firstName, lastName, group, password)
         .then(userId => {
             const payload = {id: userId};
             const token = jwt.sign(payload, secret, {expiresIn: '365d'});
             let expiresAt = Date.now() + +365 * 24 * 60 * 60 * 1000;
             res.json({token, expiresAt: expiresAt, userId: userId});
         })
-    // TODO: Выдавать ошибку в Front-End, если юзер уже существует.
-};
+});
 
-exports.getUserData = function (userId, res) {
-    userData.getUser(userId).then(data => res.json(data))
-};
+export default user;
 
-exports.getUserModels = function (userId, res) {
-    userData.getUserModels(userId).then(data => res.json(data));
-};
+export function checkToken(req, res, callback) {
+    const token = req.query.token;
+    if (!token) {
+        res.status(401).send('Unauthorized: No token provided');
+    } else {
+        jwt.verify(token, secret, function (err, decoded) {
+            if (err) {
+                res.status(401).send('Unauthorized: Invalid token');
+            } else if (Date.now() >= decoded.exp * 1000) {
+                res.status(401).send('Unauthorized: Token expired');
+            } else {
+                const userId = decoded.id;
+                callback(userId);
+            }
+        });
+    }
+}
