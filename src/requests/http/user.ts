@@ -6,7 +6,7 @@ const user = express.Router();
 const secret = 'Tolstikoff';
 
 user.get('/token', (req, res) => {
-    signIn(req.query.email, req.query.email)
+    signIn(req.query.email, req.query.password)
         .then(id => {
             const payload = {id: id};
             const token = jwt.sign(payload, secret, {expiresIn: '30d'});
@@ -17,7 +17,7 @@ user.get('/token', (req, res) => {
 });
 
 user.post('/new', (req, res) => {
-    if (req.query.inviteCode !== 'MosPolytechRules') {
+    if (req.query.inviteCode !== 'MPU-EDU') {
         res.status(401).send('Unauthorized: Invalid invite code');
         return;
     }
@@ -29,9 +29,9 @@ user.post('/new', (req, res) => {
     signUp(email.toLowerCase(), firstName, lastName, group, password)
         .then(userId => {
             const payload = {id: userId};
-            const token = jwt.sign(payload, secret, {expiresIn: '365d'});
-            let expiresAt = Date.now() + +365 * 24 * 60 * 60 * 1000;
-            res.json({token, expiresAt: expiresAt, userId: userId});
+            const token = jwt.sign(payload, secret, {expiresIn: '30d'});
+            let expiresAt = Date.now() + +30 * 24 * 60 * 60 * 1000;
+            res.json({token, expiresAt: expiresAt});
         })
 });
 

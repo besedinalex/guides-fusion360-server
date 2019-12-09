@@ -5,8 +5,8 @@ export function signUp(email: string, firstName: string, lastName: string, group
     return new Promise((resolve, reject) => {
         const cryptedPassword = encrypt(password);
         const sql =
-        `INSERT INTO Users (firstName, lastName, email, password, group)
-        VALUES ('${firstName}','${lastName}','${email}','${cryptedPassword}', '${group}')`;
+        `INSERT INTO Users (firstName, lastName, email, password, group_)
+        VALUES ('${firstName}', '${lastName}', '${email}', '${cryptedPassword}', '${group}')`;
         db.run(sql, [], function(err) {
             if (err) {
                 reject(err);
@@ -31,9 +31,8 @@ export function signIn(email: string, password: string): Promise<number> {
                 const err = new Error('Неверный логин или пароль.');
                 reject(err);
             } else {
-                console.log(rows[0]);
                 resolve(rows[0].id);
             }
         });
     });
-};
+}
