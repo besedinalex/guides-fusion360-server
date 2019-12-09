@@ -1,15 +1,24 @@
 import express from 'express';
 import cors from 'cors';
-import guide from "./requests/http/guides";
+import guide from './requests/http/guides';
+import user from './requests/http/user';
+import annotations from "./requests/http/model-annotations";
 
 const app = express();
 
 app.use(cors());
-app.use('/guide', guide);
+app.use('/guides', guide);
+app.use('/user', user);
+app.use('/annotations', annotations);
 app.use('/images', express.static(projectFolderPath() + '/assets/images'));
 app.use('/models', express.static(projectFolderPath() + '/assets/models'));
+app.use('/', express.static(projectFolderPath() + '/build'));
 
-app.listen(4000, () => console.log('Server is started.'));
+app.get('*', (req, res) => {
+    res.sendFile(projectFolderPath() + '/build/index.html');
+});
+
+app.listen(4004, () => console.log('Server is started.'));
 
 function projectFolderPath(): string {
     const path = process.argv[1].split('/');

@@ -15,7 +15,7 @@ export function selectGuides(): Promise<Guide[]> {
     });
 }
 
-export function selectGuideImage(guideId: number): Promise<string> {
+export function selectGuideImageName(guideId: number): Promise<string> {
     return new Promise((resolve, reject) => {
         const sql =
         `SELECT Guides.imageName

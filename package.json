@@ -21,12 +21,14 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "request": "^2.88.0",
     "sqlite3": "^4.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.1",
+    "@types/jsonwebtoken": "^8.3.5",
     "@types/node": "^12.12.3",
     "@types/request": "^2.48.3",
     "@types/sqlite3": "^3.1.5",
