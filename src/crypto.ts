@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
 const algorithm = 'aes-256-ctr';
+// TODO: Update before deploy.
 const password = 'Polytech';
 
 export function encrypt(decryptedText: string): string {

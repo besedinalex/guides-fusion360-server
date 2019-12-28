@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import {signUp, signIn} from '../db/user';
 
 const user = express.Router();
+// TODO: Update before deploy.
 const secret = 'Tolstikoff';
 
 user.get('/token', (req, res) => {
