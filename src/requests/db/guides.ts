@@ -1,4 +1,4 @@
-import db from './main';
+import db from './db-connection';
 import Guide from "../../interfaces/guide";
 import PartGuide from "../../interfaces/part-guide";
 

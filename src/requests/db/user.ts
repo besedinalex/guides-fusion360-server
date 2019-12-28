@@ -1,4 +1,4 @@
-import db from './main';
+import db from './db-connection';
 import {encrypt} from '../../crypto';
 
 export function signUp(email: string, firstName: string, lastName: string, group: string, password: string): Promise<number> {

@@ -1,4 +1,4 @@
-import db from "./main";
+import db from "./db-connection";
 import ModelAnnotation from "../../interfaces/model-annotation";
 
 export function selectModelAnnotations(guideId: number): Promise<Array<ModelAnnotation>> {
