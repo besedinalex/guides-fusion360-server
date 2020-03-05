@@ -5,28 +5,20 @@ import user from './requests/http/user';
 import annotations from "./requests/http/model-annotations";
 
 const app = express();
+const projectFolderPath = __dirname.replace('src', '');
 
+// Some security stuff
 app.use(cors());
+
+// Requests
 app.use('/guides', guide);
 app.use('/user', user);
 app.use('/annotations', annotations);
-app.use('/images', express.static(projectFolderPath() + '/assets/images'));
-app.use('/models', express.static(projectFolderPath() + '/assets/models'));
-app.use('/', express.static(projectFolderPath() + '/build'));
 
-app.get('*', (req, res) => {
-    res.sendFile(projectFolderPath() + '/build/index.html');
-});
+// Public access files
+app.use('/', express.static(projectFolderPath + '/public'));
+app.use('/images', express.static(projectFolderPath + '/data/images'));
+app.use('/models', express.static(projectFolderPath + '/data/models'));
+app.get('*', (req, res) => res.sendFile(projectFolderPath + '/public/index.html'));
 
 app.listen(4004, () => console.log('Server is started.'));
-
-function projectFolderPath(): string {
-    const path = process.argv[1].split('/');
-    const file = path[path.length - 1];
-    const extension = file.split('.')[1];
-    if (extension === 'ts') {
-        return __dirname.slice(0, __dirname.length - 4);
-    } else {
-        return __dirname.slice(0, __dirname.length - 5);
-    }
-}

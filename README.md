@@ -22,4 +22,6 @@ Run `npm run dev` to start dev server (auto-compile TypeScript files on change).
 
 Run `npm run build` to get JavaScript files.
 
+Remove or rename `src/` folder and rename built `dist/` to `src/`.
+
 Run `npm run start` to start server from JavaScript files.

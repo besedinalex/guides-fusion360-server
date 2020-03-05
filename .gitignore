@@ -90,3 +90,4 @@ typings/
 .idea/
 dist/
 .DS_Store
+public/
