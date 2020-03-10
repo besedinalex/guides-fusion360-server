@@ -1,19 +1,22 @@
 import crypto from 'crypto';
 
+const encryptionKey = 'F7O3bbsUFEeRylaPLpZFwbOYpR9bRGXr'; // Random 32 chars TODO: Update before deploy
+const ivLength = 16; // Always 16 for AES
 const algorithm = 'aes-256-ctr';
-// TODO: Update before deploy.
-const password = 'Polytech';
 
-export function encrypt(decryptedText: string): string {
-    const cipher = crypto.createCipher(algorithm, password);
-    let crypted = cipher.update(decryptedText, 'utf8', 'hex');
-    crypted += cipher.final('hex');
-    return crypted;
+export function encrypt(text: string): string {
+    const iv = crypto.randomBytes(ivLength);
+    const cipher = crypto.createCipheriv(algorithm, Buffer.from(encryptionKey), iv);
+    const encrypted =  Buffer.concat([cipher.update(text), cipher.final()]);
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
 }
 
-export function decrypt(cryptedText: string): string {
-    const decipher = crypto.createDecipher(algorithm, password);
-    let dec = decipher.update(cryptedText, 'hex', 'utf8');
-    dec += decipher.final('utf8');
-    return dec;
+export function decrypt(text: string): string {
+    const textParts = text.split(':');
+    // @ts-ignore
+    const iv = Buffer.from(textParts.shift(), 'hex');
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv(algorithm, Buffer.from(encryptionKey), iv);
+    const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
+    return decrypted.toString();
 }
