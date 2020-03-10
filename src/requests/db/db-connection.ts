@@ -19,7 +19,7 @@ function createUsersTable() {
         'email' TEXT NOT NULL UNIQUE,
         'firstName' TEXT NOT NULL,
         'lastName' TEXT NOT NULL,
-        'group' TEXT NOT NULL,
+        'studyGroup' TEXT NOT NULL,
         'password' TEXT NOT NULL
         );`;
     runQuery(sqlQuery, 'Users table have been created');

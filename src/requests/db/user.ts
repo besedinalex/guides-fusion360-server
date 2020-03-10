@@ -8,7 +8,7 @@ interface UserLoginData {
 export function signUp(email: string, firstName: string, lastName: string, group: string, password: string): Promise<number> {
     return new Promise((resolve, reject) => {
         const sql =
-            `INSERT INTO Users (firstName, lastName, email, password, group)
+            `INSERT INTO Users (firstName, lastName, email, password, studyGroup)
             VALUES ('${firstName}', '${lastName}', '${email}', '${password}', '${group}')`;
         db.run(sql, [], function(err) {
             if (err) {
