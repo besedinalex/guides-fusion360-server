@@ -18,6 +18,8 @@ Make sure that your CLI now handles `node`, `npm`, `tsc` commands.
 
 Run `npm run dev` to start dev server (auto-compile TypeScript files on change).
 
+Run `npm run test` to run tests.
+
 ### Deploy
 
 Run `npm run build` to get JavaScript files.
