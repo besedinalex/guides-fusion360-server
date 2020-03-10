@@ -19,7 +19,7 @@ export function selectGuideCode(guideId: number): Promise<string> {
     return new Promise((resolve, reject) => {
         const sql = `SELECT Guides.code FROM Guides WHERE Guides.id = ${guideId}`;
         db.all(sql, [], (err, rows: Guide) => {
-            if (err) {
+            if (err || rows === undefined) {
                 reject(err);
             } else {
                 resolve(rows[0].code);
@@ -36,7 +36,7 @@ export function selectPartGuides(guideId: number): Promise<PartGuide[]> {
         WHERE PartGuide.guideId = ${guideId}
         ORDER BY PartGuide.sortKey ASC`;
         db.all(sql, [], (err, rows: PartGuide[]) => {
-            if (err) {
+            if (err || rows.length === 0) {
                 reject(err);
             } else {
                 resolve(rows);
