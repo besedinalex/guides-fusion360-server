@@ -1,13 +1,10 @@
 import db from "./db-connection";
 import ModelAnnotation from "../../interfaces/model-annotation";
 
-export function selectModelAnnotations(guideId: number): Promise<Array<ModelAnnotation>> {
+export function selectModelAnnotations(guideId: number): Promise<ModelAnnotation[]> {
     return new Promise((resolve, reject) => {
-        const sql =
-        `SELECT ModelAnnotations.x, ModelAnnotations.y, ModelAnnotations.z, ModelAnnotations.text
-        FROM ModelAnnotations
-        WHERE ModelAnnotations.guideId = ${guideId}`;
-        db.all(sql, [], (err, rows: Array<ModelAnnotation>) => {
+        const sql = `SELECT MA.x, MA.y, MA.z, MA.text FROM ModelAnnotations as MA WHERE MA.guideId = ${guideId}`;
+        db.all(sql, [], (err, rows: ModelAnnotation[]) => {
             if (err) {
                 reject(err);
             } else {
@@ -26,7 +23,7 @@ export function insertNewAnnotation(guideId: number, x: number, y: number, z: nu
             if (err) {
                 reject(err);
             } else {
-                resolve('success');
+                resolve('Success');
             }
         });
     });
