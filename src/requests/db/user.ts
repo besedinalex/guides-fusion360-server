@@ -34,3 +34,6 @@ export function signIn(email: string): Promise<UserLoginData> {
         });
     });
 }
+ export function removeUser(email: string) {
+     db.run(`DELETE FROM Users WHERE Users.email = '${email}'`);
+ }
