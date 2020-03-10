@@ -17,8 +17,8 @@ export function selectModelAnnotations(guideId: number): Promise<ModelAnnotation
 export function insertNewAnnotation(guideId: number, x: number, y: number, z: number, text: string): Promise<string> {
     return new Promise((resolve, reject) => {
         const sql =
-        `INSERT INTO ModelAnnotations (guideId, x, y, z, text)
-        VALUES ('${guideId}', '${x}', '${y}', '${z}', '${text}')`;
+            `INSERT INTO ModelAnnotations (guideId, x, y, z, text)
+            VALUES ('${guideId}', '${x}', '${y}', '${z}', '${text}')`;
         db.run(sql, [], err => {
             if (err) {
                 reject(err);
