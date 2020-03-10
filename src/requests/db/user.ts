@@ -1,12 +1,15 @@
 import db from './db-connection';
-import {encrypt} from '../../crypto';
+
+interface UserLoginData {
+    id: number;
+    password: string;
+}
 
 export function signUp(email: string, firstName: string, lastName: string, group: string, password: string): Promise<number> {
     return new Promise((resolve, reject) => {
-        const cryptedPassword = encrypt(password);
         const sql =
-        `INSERT INTO Users (firstName, lastName, email, password, group_)
-        VALUES ('${firstName}', '${lastName}', '${email}', '${cryptedPassword}', '${group}')`;
+            `INSERT INTO Users (firstName, lastName, email, password, group)
+            VALUES ('${firstName}', '${lastName}', '${email}', '${password}', '${group}')`;
         db.run(sql, [], function(err) {
             if (err) {
                 reject(err);
@@ -17,21 +20,16 @@ export function signUp(email: string, firstName: string, lastName: string, group
     });
 }
 
-export function signIn(email: string, password: string): Promise<number> {
+export function signIn(email: string): Promise<UserLoginData> {
     return new Promise((resolve, reject) => {
-        const cryptedPassword = encrypt(password);
-        const sql =
-        `SELECT Users.id
-        FROM Users 
-        WHERE email = '${email}' AND password = '${cryptedPassword}'`;
-        db.all(sql, [], (err, rows) => {
+        const sql = `SELECT Users.id, Users.password FROM Users WHERE email = '${email}'`;
+        db.all(sql, [], (err, rows: UserLoginData[]) => {
             if (err) {
                 reject(err);
             } else if (rows.length === 0) {
-                const err = new Error('Неверный логин или пароль.');
                 reject(err);
             } else {
-                resolve(rows[0].id);
+                resolve(rows[0]);
             }
         });
     });
