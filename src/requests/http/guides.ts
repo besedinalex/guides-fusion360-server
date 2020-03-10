@@ -1,4 +1,4 @@
-import {selectGuideImageName, selectGuides, selectPartGuides} from "../db/guides";
+import {selectGuideCode, selectGuides, selectPartGuides} from "../db/guides";
 import Guide from "../../interfaces/guide";
 import PartGuide from "../../interfaces/part-guide";
 
@@ -11,7 +11,7 @@ guide.get('/all', (req, res) => {
 });
 
 guide.get('/img', (req, res) => {
-    selectGuideImageName(req.query.guideId).then((data: string) => res.json(data));
+    selectGuideCode(req.query.guideId).then((data: string) => res.json(data));
 });
 
 guide.get('/parts', (req, res) => {

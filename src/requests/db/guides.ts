@@ -4,7 +4,7 @@ import PartGuide from "../../interfaces/part-guide";
 
 export function selectGuides(): Promise<Guide[]> {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM Guides`;
+        const sql = `SELECT G.id, G.name, G.description FROM Guides AS G`;
         db.all(sql, [], (err, rows: Guide[]) => {
             if (err) {
                 reject(err);
@@ -15,17 +15,14 @@ export function selectGuides(): Promise<Guide[]> {
     });
 }
 
-export function selectGuideImageName(guideId: number): Promise<string> {
+export function selectGuideCode(guideId: number): Promise<string> {
     return new Promise((resolve, reject) => {
-        const sql =
-        `SELECT Guides.imageName
-        FROM Guides
-        WHERE Guides.id = ${guideId}`;
+        const sql = `SELECT Guides.code FROM Guides WHERE Guides.id = ${guideId}`;
         db.all(sql, [], (err, rows: Guide) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(rows[0].imageName);
+                resolve(rows[0].code);
             }
         });
     });
