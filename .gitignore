@@ -87,7 +87,13 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+# IDEs specific
 .idea/
 dist/
-.DS_Store
+
+# Content data
 public/
+data/
+
+# System files
+.DS_Store
