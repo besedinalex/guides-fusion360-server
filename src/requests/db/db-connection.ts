@@ -1,11 +1,11 @@
 import sqlite3 from 'sqlite3';
+
 sqlite3.verbose();
 
 const db = new sqlite3.Database('./data/database.sqlite3', err => {
     if (err) {
         return console.error(err.message);
     }
-    console.log('Database is connected');
     createUsersTable();
     createGuidesTable();
     createPartGuidesTable();
@@ -22,7 +22,7 @@ function createUsersTable() {
         'studyGroup' TEXT NOT NULL,
         'password' TEXT NOT NULL
         );`;
-    runQuery(sqlQuery, 'Users table have been created');
+    db.run(sqlQuery);
 }
 
 function createGuidesTable() {
@@ -35,7 +35,7 @@ function createGuidesTable() {
         'ownerId' INTEGER NOT NULL,
         FOREIGN KEY('ownerId') REFERENCES 'Users'('id')
         );`;
-    runQuery(sqlQuery, 'Guides table have been created');
+    db.run(sqlQuery);
 }
 
 function createPartGuidesTable() {
@@ -47,7 +47,7 @@ function createPartGuidesTable() {
         'sortKey' INTEGER NOT NULL,
         FOREIGN KEY('guideId') REFERENCES 'Guides'('id')
         );`;
-    runQuery(sqlQuery, 'PartGuides table have been created');
+    db.run(sqlQuery);
 }
 
 function createModelAnnotationsTable() {
@@ -60,17 +60,7 @@ function createModelAnnotationsTable() {
         'text' TEXT NOT NULL,
         FOREIGN KEY('guideId') REFERENCES 'Guides'('id')
         );`;
-    runQuery(sqlQuery, 'ModelAnnotations table have been created');
-}
-
-function runQuery(sqlQuery: string, successMessage: string) {
-    db.run(sqlQuery, err => {
-        if (err) {
-            console.error(err);
-        } else {
-            console.log(successMessage);
-        }
-    });
+    db.run(sqlQuery);
 }
 
 export default db;
