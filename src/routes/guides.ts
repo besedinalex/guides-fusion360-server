@@ -8,7 +8,8 @@ import {
     selectGuides,
     selectPartGuide,
     selectPartGuides,
-    updatePartGuide, updatePartGuideSortKey
+    updatePartGuide,
+    updatePartGuideSortKey
 } from "../db/guides";
 import Guide from "../interfaces/guide";
 import PartGuide from "../interfaces/part-guide";
@@ -17,7 +18,7 @@ import {selectUserAccess} from "../db/user";
 
 const guide = express.Router();
 const upload = multer({storage: multer.memoryStorage()});
-const storagePath = path.join(__dirname, '..', '..', 'data/storage'); // Temp
+const storagePath = path.join(process.cwd(), 'data/storage');
 
 guide.get('/all', (req, res) => {
     selectGuides().then((data: Guide[]) => res.json(data));
