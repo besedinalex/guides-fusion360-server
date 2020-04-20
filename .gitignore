@@ -97,3 +97,6 @@ data/
 
 # System files
 .DS_Store
+
+# Executables
+guides-fusion360-server.exe
