@@ -18,8 +18,7 @@ Run `npm run test` to run tests.
 
 ### Deploy
 
-Run `npm run build` to get JavaScript files.
+Run `npm run ts2js` to get JavaScript files.
 
-Remove or rename `src/` folder and rename built `dist/` to `src/`.
+Copy React `build/` files to `public/` folder.
 
-Run `npm run start` to start server from JavaScript files.
