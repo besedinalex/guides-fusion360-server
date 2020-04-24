@@ -1,6 +1,6 @@
 import express from 'express';
 import {selectModelAnnotations} from "../db/model-annotations";
-import ModelAnnotation from "../../interfaces/model-annotation";
+import ModelAnnotation from "../interfaces/model-annotation";
 
 const annotations = express.Router();
 

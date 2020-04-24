@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import guide from './requests/http/guides';
-import user from './requests/http/user';
-import annotations from "./requests/http/model-annotations";
+import guide from './routes/guides';
+import user from './routes/user';
+import annotations from "./routes/model-annotations";
 
 const app = express();
 const projectFolderPath = __dirname.replace('src', '');
@@ -17,8 +17,7 @@ app.use('/annotations', annotations);
 
 // Public access files
 app.use('/', express.static(projectFolderPath + '/public'));
-app.use('/images', express.static(projectFolderPath + '/data/images'));
-app.use('/models', express.static(projectFolderPath + '/data/models'));
+app.use('/storage', express.static(projectFolderPath + '/data/storage'));
 app.get('*', (req, res) => res.sendFile(projectFolderPath + '/public/index.html'));
 
 app.listen(4004, () => console.log('Server is started.'));

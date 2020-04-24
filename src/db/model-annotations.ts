@@ -1,5 +1,5 @@
 import db from "./db-connection";
-import ModelAnnotation from "../../interfaces/model-annotation";
+import ModelAnnotation from "../interfaces/model-annotation";
 
 export function selectModelAnnotations(guideId: number): Promise<ModelAnnotation[]> {
     return new Promise((resolve, reject) => {
@@ -14,16 +14,16 @@ export function selectModelAnnotations(guideId: number): Promise<ModelAnnotation
     });
 }
 
-export function insertNewAnnotation(guideId: number, x: number, y: number, z: number, text: string): Promise<string> {
+export function insertNewAnnotation(guideId: number, x: number, y: number, z: number, text: string): Promise<number> {
     return new Promise((resolve, reject) => {
         const sql =
             `INSERT INTO ModelAnnotations (guideId, x, y, z, text)
             VALUES ('${guideId}', '${x}', '${y}', '${z}', '${text}')`;
-        db.run(sql, [], err => {
+        db.run(sql, [], function (err) {
             if (err) {
                 reject(err);
             } else {
-                resolve('Success');
+                resolve(this.changes);
             }
         });
     });
