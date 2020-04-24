@@ -10,9 +10,9 @@ Make sure that your CLI now handles `node` and `npm` commands.
 
 ### Debug
 
-Run `npm run dev` to start dev server (auto-compile TypeScript files on change).
+Run `npm start` to start dev server (auto-compile TypeScript files on change).
 
-Run `npm run test` to run tests.
+Run `npm test` to run tests.
 
 ### Deploy
 

@@ -4,7 +4,7 @@
   "description": "FUSION360GUIDE node server",
   "bin": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
+    "start": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "ts2js": "tsc",
     "sqlite-win-x86": "npm i sqlite3 --target_arch=ia32",
