@@ -13,7 +13,7 @@ import {
 } from "../db/guides";
 import Guide from "../interfaces/guide";
 import PartGuide from "../interfaces/part-guide";
-import {tokenToUserId} from "../access-check";
+import {tokenToUserId} from "../utils/access-check";
 import {selectUserAccess} from "../db/user";
 
 const guide = express.Router();

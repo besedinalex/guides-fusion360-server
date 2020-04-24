@@ -1,22 +1,4 @@
-import sqlite3 from 'sqlite3';
-
-sqlite3.verbose();
-
-const db = new sqlite3.Database('./data/database.sqlite3', err => {
-    if (err) {
-        return console.error(err.message);
-    }
-    console.log('Database is connected.');
-    for (const query of sqlCreateQueries) {
-        db.run(query, err => {
-            if (err) {
-                console.error(err);
-            }
-        });
-    }
-});
-
-const sqlCreateQueries = [
+export const sqlCreateQueries = [
     `CREATE TABLE IF NOT EXISTS 'Users' (
     'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     'email' TEXT NOT NULL UNIQUE,
@@ -24,8 +6,7 @@ const sqlCreateQueries = [
     'firstName' TEXT NOT NULL,
     'lastName' TEXT NOT NULL,
     'access' TEXT NOT NULL,
-    'studyGroup' TEXT,
-    'hidden' TEXT NOT NULL
+    'studyGroup' TEXT
     );`,
 
     `CREATE TABLE IF NOT EXISTS 'Guides' (
@@ -33,8 +14,7 @@ const sqlCreateQueries = [
     'name' TEXT NOT NULL,
     'description' TEXT,
     'ownerId' INTEGER NOT NULL,
-    'hidden' TEXT NOT NULL,
-    FOREIGN KEY('ownerId') REFERENCES 'Users'('id')
+    'hidden' TEXT NOT NULL
     );`,
 
     `CREATE TABLE IF NOT EXISTS 'PartGuides' (
@@ -55,5 +35,3 @@ const sqlCreateQueries = [
     FOREIGN KEY('guideId') REFERENCES 'Guides'('id')
     );`
 ];
-
-export default db;

@@ -1,4 +1,9 @@
-import db from './db-connection';
+import {changeData, selectData} from "./api/run-query";
+
+interface UserLoginData {
+    id: number;
+    password: string;
+}
 
 interface UserData {
     id: number;
@@ -7,120 +12,59 @@ interface UserData {
     lastName: string;
     studyGroup: string;
     access: string;
-    hidden: string;
 }
 
-interface UserLoginData {
-    id: number;
-    password: string;
-    hidden: string;
+function selectUserLoginData(email: string): Promise<UserLoginData> {
+    const sql = `SELECT U.id, U.password FROM Users AS U WHERE email = '${email}'`;
+    return selectData(sql, true) as Promise<UserLoginData>;
 }
 
-export function selectUserAccess(id: number): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT Users.access FROM Users WHERE id='${id}'`;
-        db.all(sql, [], (err, rows) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows[0].access);
-            }
-        });
-    });
+function selectUserData(id: number): Promise<UserData> {
+    const sql = `SELECT U.id, U.email, U.firstName, U.lastName, U.access, U.studyGroup FROM Users AS U WHERE id=${id}`;
+    return selectData(sql, true) as Promise<UserData>;
 }
 
-export function selectUserData(id: number): Promise<UserData> {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM Users WHERE id=${id}`;
-        db.all(sql, [], (err, rows: UserData[]) => {
-            if (err || rows.length === 0) {
-                reject(err);
-            } else {
-                resolve(rows[0]);
-            }
-        });
-    });
+function selectUserAccess(id: number): Promise<string> {
+    const sql = `SELECT U.access FROM Users AS U WHERE id=${id}`;
+    return selectData(sql, true) as Promise<string>;
 }
 
-export function selectUserLoginData(email: string): Promise<UserLoginData> {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT U.id, U.password, U.hidden FROM Users AS U WHERE email = '${email}'`;
-        db.all(sql, [], (err, rows: UserLoginData[]) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows[0]);
-            }
-        });
-    });
+function insertNewUser(email: string, firstName: string, lastName: string, group: string, password: string): Promise<number> {
+    const sql =
+        `INSERT INTO Users (firstName, lastName, email, password, studyGroup, access)
+        VALUES ('${firstName}', '${lastName}', '${email}', '${password}', '${group}', 'unknown')`;
+    return changeData(sql) as Promise<number>;
 }
 
-export function insertNewUser(email: string, firstName: string, lastName: string, group: string, password: string, access: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-        const sql =
-            `INSERT INTO Users (firstName, lastName, email, password, studyGroup, access, hidden)
-            VALUES ('${firstName}', '${lastName}', '${email}', '${password}', '${group}', '${access}', 'false')`;
-        db.run(sql, [], function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(this.lastID);
-            }
-        });
-    });
+function updatePassword(email: string, password: string): Promise<number> {
+    const sql = `UPDATE Users SET password='${password}' WHERE email='${email}'`;
+    return changeData(sql) as Promise<number>;
 }
 
-export function updatePassword(email: string, password: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-        const sql = `UPDATE Users SET password='${password}' WHERE email='${email}'`;
-        db.run(sql, [], function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(this.changes);
-            }
-        });
-    });
+function updateUserAccess(email: string, access: string): Promise<number> {
+    const sql = `UPDATE Users SET access='${access}' WHERE email='${email}'`;
+    return changeData(sql) as Promise<number>;
 }
 
-export function updateUserAccess(email: string, access: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-        const sql = `UPDATE Users SET access='${access}' WHERE email='${email}'`;
-        db.run(sql, [], function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(this.changes);
-            }
-        });
-    });
+function updateUserData(email: string, firstName: string, lastName: string, studyGroup: string): Promise<number> {
+    const sql =
+        `UPDATE Users SET firstName='${firstName}', lastName='${lastName}', studyGroup='${studyGroup}'
+        WHERE email='${email}'`;
+    return changeData(sql) as Promise<number>;
 }
 
-export function updateUserData(email: string, firstName: string, lastName: string, studyGroup: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-        const sql =
-            `UPDATE Users
-            SET firstName='${firstName}', lastName='${lastName}', studyGroup='${studyGroup}'
-            WHERE email='${email}'`;
-        db.run(sql, [], function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(this.changes);
-            }
-        });
-    });
+function deleteUser(email: string): Promise<number> {
+    const sql = `DELETE FROM Users WHERE email='${email}'`;
+    return changeData(sql) as Promise<number>;
 }
 
-export function deleteUser(email: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-        const sql = `UPDATE Users SET hidden='true' WHERE email='${email}'`;
-        db.run(sql, [], function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(this.changes);
-            }
-        });
-    });
+export {
+    selectUserLoginData,
+    selectUserData,
+    selectUserAccess,
+    insertNewUser,
+    updatePassword,
+    updateUserAccess,
+    updateUserData,
+    deleteUser
 }

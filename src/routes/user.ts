@@ -1,8 +1,8 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import {deleteUser, insertNewUser, selectUserAccess, selectUserData, selectUserLoginData} from '../db/user';
-import {encrypt, decrypt} from "../crypto";
-import {jwtSecret, tokenToUserId} from "../access-check";
+import {encrypt, decrypt} from "../utils/crypto";
+import {jwtSecret, tokenToUserId} from "../utils/access-check";
 
 const user = express.Router();
 
@@ -40,8 +40,6 @@ user.get('/token', (req, res) => {
         .then(user => {
             if (decrypt(user.password) !== req.query.password) {
                 res.sendStatus(401);
-            } else if (user.hidden === 'true') {
-                res.sendStatus(403);
             } else {
                 const payload = {id: user.id};
                 const token = jwt.sign(payload, jwtSecret, {expiresIn: '30d'});
@@ -58,7 +56,7 @@ user.post('/new', (req, res) => {
     const lastName = req.query.lastName;
     const group = req.query.group;
     const password = req.query.password;
-    insertNewUser(email.toLowerCase(), firstName, lastName, group, encrypt(password), 'unknown')
+    insertNewUser(email.toLowerCase(), firstName, lastName, group, encrypt(password))
         .then(userId => {
             const payload = {id: userId};
             const token = jwt.sign(payload, jwtSecret, {expiresIn: '30d'});

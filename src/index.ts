@@ -20,4 +20,4 @@ app.use('/', express.static(path.join(__dirname, '..', 'public')));
 app.use('/storage', express.static(process.cwd() + '/data/storage'));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'index.html')));
 
-app.listen(4004, () => console.log('Server is started.'));
+app.listen(4004, () => console.log('Server is started'));

@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {encrypt, decrypt} from "../src/crypto";
+import {encrypt, decrypt} from "../src/utils/crypto";
 
 describe('Crypto', function () {
     it('Encrypts text', function (done) {

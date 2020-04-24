@@ -1,30 +1,19 @@
-import db from "./db-connection";
+import {changeData, selectData} from "./api/run-query";
 import ModelAnnotation from "../interfaces/model-annotation";
 
-export function selectModelAnnotations(guideId: number): Promise<ModelAnnotation[]> {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT MA.x, MA.y, MA.z, MA.text FROM ModelAnnotations as MA WHERE MA.guideId = ${guideId}`;
-        db.all(sql, [], (err, rows: ModelAnnotation[]) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
+function selectModelAnnotations(guideId: number): Promise<ModelAnnotation[]> {
+    const sql = `SELECT MA.x, MA.y, MA.z, MA.text FROM ModelAnnotations as MA WHERE MA.guideId = ${guideId}`;
+    return selectData(sql) as Promise<ModelAnnotation[]>;
 }
 
-export function insertNewAnnotation(guideId: number, x: number, y: number, z: number, text: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-        const sql =
-            `INSERT INTO ModelAnnotations (guideId, x, y, z, text)
-            VALUES ('${guideId}', '${x}', '${y}', '${z}', '${text}')`;
-        db.run(sql, [], function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(this.changes);
-            }
-        });
-    });
+function insertNewAnnotation(guideId: number, x: number, y: number, z: number, text: string): Promise<number> {
+    const sql =
+        `INSERT INTO ModelAnnotations (guideId, x, y, z, text)
+        VALUES ('${guideId}', '${x}', '${y}', '${z}', '${text}')`;
+    return changeData(sql) as Promise<number>;
+}
+
+export {
+    selectModelAnnotations,
+    insertNewAnnotation
 }
