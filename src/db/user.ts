@@ -24,9 +24,9 @@ function selectUserData(id: number): Promise<UserData> {
     return selectData(sql, true) as Promise<UserData>;
 }
 
-function selectUserAccess(id: number): Promise<string> {
+function selectUserAccess(id: number): Promise<{access: string}> {
     const sql = `SELECT U.access FROM Users AS U WHERE id=${id}`;
-    return selectData(sql, true) as Promise<string>;
+    return selectData(sql, true) as Promise<{access: string}>;
 }
 
 function insertNewUser(email: string, firstName: string, lastName: string, group: string, password: string): Promise<number> {

@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import guide from './routes/guides';
+import guides from './routes/guides';
 import user from './routes/user';
 import annotations from "./routes/model-annotations";
 
@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 
 // Requests
-app.use('/guides', guide);
+app.use('/guides', guides);
 app.use('/user', user);
 app.use('/annotations', annotations);
 
