@@ -14,6 +14,18 @@ interface UserData {
     access: string;
 }
 
+const userTable =
+    `CREATE TABLE IF NOT EXISTS 'Users' (
+    'id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    'email' TEXT NOT NULL UNIQUE,
+    'password' TEXT NOT NULL,
+    'firstName' TEXT NOT NULL,
+    'lastName' TEXT NOT NULL,
+    'access' TEXT NOT NULL,
+    'studyGroup' TEXT
+    );`;
+changeData(userTable);
+
 function selectUserLoginData(email: string): Promise<UserLoginData> {
     const sql = `SELECT U.id, U.password FROM Users AS U WHERE email = '${email}'`;
     return selectData(sql, true) as Promise<UserLoginData>;

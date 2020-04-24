@@ -1,6 +1,17 @@
 import {changeData, selectData} from "./api/run-query";
 import ModelAnnotation from "../interfaces/model-annotation";
 
+const modelAnnotationsTable =
+    `CREATE TABLE IF NOT EXISTS 'ModelAnnotations' (
+    'guideId' INTEGER NOT NULL,
+    'x' INTEGER NOT NULL,
+    'y' INTEGER NOT NULL,
+    'z' INTEGER NOT NULL,
+    'text' TEXT NOT NULL,
+    FOREIGN KEY('guideId') REFERENCES 'Guides'('id')
+    );`;
+changeData(modelAnnotationsTable);
+
 function selectModelAnnotations(guideId: number): Promise<ModelAnnotation[]> {
     const sql = `SELECT MA.x, MA.y, MA.z, MA.text FROM ModelAnnotations as MA WHERE MA.guideId = ${guideId}`;
     return selectData(sql) as Promise<ModelAnnotation[]>;
