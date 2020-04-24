@@ -6,6 +6,7 @@ import user from './routes/user';
 import annotations from "./routes/model-annotations";
 
 const app = express();
+const port = 4004;
 
 // Some security stuff
 app.use(cors());
@@ -20,4 +21,4 @@ app.use('/', express.static(path.join(__dirname, '..', 'public')));
 app.use('/storage', express.static(process.cwd() + '/data/storage'));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'index.html')));
 
-app.listen(4004, () => console.log('Server is started'));
+app.listen(port, () => console.log(`Server is listening port ${port}`));
