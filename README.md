@@ -1,14 +1,12 @@
 # Beginner's guides to Fusion 360
 
-Web server for keeping guides data and making possible creating and editing them with simple http requests.
+Web server for keeping guides data and making possible creating and editing them.
 
 ### Setup
 
 Install Node.js from their [site](https://nodejs.org/en/download).
 
 Make sure that your CLI now handles `node` and `npm` commands.
-
-Create folder `data/` in project root folder.
 
 ### Debug
 
@@ -22,3 +20,4 @@ Run `npm run ts2js` to get JavaScript files.
 
 Copy React `build/` files to `public/` folder.
 
+...
