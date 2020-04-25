@@ -18,8 +18,7 @@ function detectQueryType(sqlQuery: string): string {
  */
 function selectData(sqlQuery: string, firstValueOnly = false): Promise<any> | void {
     if (detectQueryType(sqlQuery) !== 'select') {
-        console.error('\nERROR: selectData() expects sql SELECT query\n');
-        return;
+        throw Error('selectData() expects sql SELECT query');
     }
     return new Promise((resolve, reject) => {
         db.all(sqlQuery, [], function (err, rows) {
@@ -49,8 +48,7 @@ function selectData(sqlQuery: string, firstValueOnly = false): Promise<any> | vo
 function changeData(sqlQuery: string): Promise<number> | void {
     const queryType = detectQueryType(sqlQuery);
     if (queryType !== 'insert' && queryType !== 'update' && queryType !== 'delete' && queryType !== 'create') {
-        console.error('\nERROR: changeData() expects sql INSERT or UPDATE or DELETE or CREATE query\n');
-        return;
+        throw Error('changeData() expects sql INSERT or UPDATE or DELETE or CREATE query');
     }
     return new Promise((resolve, reject) => {
         db.run(sqlQuery, [], function (err) {

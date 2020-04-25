@@ -12,7 +12,7 @@ if (!fs.pathExistsSync(databasePath)) {
 // Creates database connection
 const db = new sqlite3.Database('./data/database.sqlite3', err => {
     if (err) {
-        return console.error('\nERROR: Cannot connect to database\n');
+        throw Error('cannot connect to database');
     }
 });
 
