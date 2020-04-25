@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 
-export const jwtSecret = 'Tolstikoff'; // TODO: Update before deploy.
+const jwtSecret = 'Tolstikoff'; // TODO: Update before deploy.
 
-export function tokenToUserId(req, res, next) {
+function tokenToUserId(req, res, next) {
     const token = req.query.token;
     if (!token) {
         res.status(401).send('Unauthorized: No token provided');
@@ -19,3 +19,5 @@ export function tokenToUserId(req, res, next) {
         });
     }
 }
+
+export {jwtSecret, tokenToUserId}
