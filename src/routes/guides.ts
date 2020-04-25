@@ -7,7 +7,7 @@ import {
     createNewGuide,
     createNewPartGuide,
     getAllGuides,
-    getAllPartGuides
+    getAllPartGuides, uploadModel
 } from "../services/guides";
 
 const guides = express.Router();
@@ -31,6 +31,11 @@ guides.post('/part-guide', [tokenToUserId, upload.single('file')], (req, res) =>
     const {body, file} = req;
     createNewPartGuide(body, file, (code, json) => res.status(code).send(json));
 });
+
+guides.post('/model', [tokenToUserId, upload.single('file')], (req, res) => {
+    const {body, file} = req;
+    uploadModel(body.guideId, file, (code, json) => res.status(code).send(json));
+})
 
 guides.put('/part-guide', [tokenToUserId, upload.single('file')], (req, res) => {
     const {body, file} = req;
