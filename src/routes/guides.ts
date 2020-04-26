@@ -8,7 +8,7 @@ import {
     createNewGuide,
     createNewPartGuide,
     getAllGuides,
-    getAllPartGuides, getHiddenGuides, getHiddenPartGuides, uploadModel
+    getAllPartGuides, getHiddenGuides, uploadModel
 } from "../services/guides";
 
 const guides = express.Router();
@@ -27,13 +27,6 @@ guides.get('/all-hidden', tokenToUserId, (req, res) => {
 guides.get('/parts', (req, res) => {
     const {guideId} = req.query;
     getAllPartGuides(guideId, (code, json) => res.status(code).send(json));
-});
-
-guides.get('/parts-hidden', tokenToUserId, (req, res) => {
-    // @ts-ignore
-    const {userId} = req;
-    const {guideId} = req.query;
-    getHiddenPartGuides(userId, guideId, (code, json) => res.status(code).send(json));
 });
 
 guides.post('/guide', [tokenToUserId, upload.single('img')], (req, res) => {

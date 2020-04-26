@@ -24,17 +24,19 @@ export function tokenToUserId(req, res, next) {
 export function userEditAccess(userId: number, access: string, result: (hasAccess: boolean, code?: number, message?: string) => void) {
     selectUserAccess(userId)
         .then(data => {
+            let hasAccess: boolean;
             switch (access) {
                 case 'admin':
-                    result(data.access === 'admin');
+                    hasAccess = data.access === 'admin';
                     break;
                 case 'editor':
-                    result(data.access === 'admin' || data.access === 'editor');
+                    hasAccess = data.access === 'admin' || data.access === 'editor';
                     break;
                 default:
-                    result(false, 403, 'Недостаточно прав доступа');
+                    hasAccess = false;
                     break
             }
+            result(hasAccess, 403, 'Недостаточно прав доступа');
         })
         .catch(() => result(false, 404, 'Пользователь не найден'));
 }

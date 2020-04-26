@@ -48,29 +48,9 @@ export function getHiddenGuides(userId: number, result: (code: number, json: obj
 }
 
 export function getAllPartGuides(guideId: number, result: (code: number, json: object) => void) {
-    selectGuideAccess(guideId)
-        .then(data => {
-            if (data.hidden === 'true') {
-                result(401, {message: 'Данные гайды скрыты'});
-            } else {
-                selectPartGuides(guideId)
-                    .then((data: PartGuide[]) => result(200, data))
-                    .catch(() => result(404, {message: 'Гайды не найдены'}));
-            }
-        })
+    selectPartGuides(guideId)
+        .then((data: PartGuide[]) => result(200, data))
         .catch(() => result(404, {message: 'Гайды не найдены'}));
-}
-
-export function getHiddenPartGuides(userId: number, guideId: number, result: (code: number, json: object) => void) {
-    userEditAccess(userId, 'editor', (hasAccess, code, message) => {
-        if (hasAccess) {
-            selectPartGuides(guideId)
-                .then((guides: PartGuide[]) => result(200, guides))
-                .catch(() => result(404, {message: 'Гайды не найдены'}));
-        } else {
-            result(code as number, {message});
-        }
-    });
 }
 
 export function createNewGuide(userId: number, body: GuideBody, file: Express.Multer.File, result: (code: number, json: object) => void) {
