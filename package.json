@@ -9,7 +9,7 @@
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "posttest": "ts-node-dev --transpileOnly tests/posttest.ts",
     "ts2js": "tsc",
-    "sqlite-win-x86": "npm i sqlite3 --target_arch=ia32",
+    "sqlite-win-x86": "npm i sqlite3-simple-api --target_arch=ia32",
     "build-win-x86": "pkg . --targets=node12-win-x86"
   },
   "pkg": {
@@ -35,7 +35,7 @@
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",
     "request": "^2.88.2",
-    "sqlite3": "^4.1.1"
+    "sqlite3-simple-api": "0.0.6"
   },
   "devDependencies": {
     "@types/chai": "^4.2.10",

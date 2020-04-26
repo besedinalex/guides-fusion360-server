@@ -1,4 +1,4 @@
-import {changeData, selectData} from "./api/run-query";
+import {changeData, selectData} from "sqlite3-simple-api";
 import Guide from "../interfaces/guide";
 import PartGuide from "../interfaces/part-guide";
 
