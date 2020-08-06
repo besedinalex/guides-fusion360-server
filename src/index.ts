@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import guide from './routes/guides';
+import guides from './routes/guides';
 import user from './routes/user';
 import annotations from "./routes/model-annotations";
+const {PORT} = require(process.cwd() + '/config.json');
 
 const app = express();
 
@@ -11,7 +12,7 @@ const app = express();
 app.use(cors());
 
 // Requests
-app.use('/guides', guide);
+app.use('/guides', guides);
 app.use('/user', user);
 app.use('/annotations', annotations);
 
@@ -20,4 +21,4 @@ app.use('/', express.static(path.join(__dirname, '..', 'public')));
 app.use('/storage', express.static(process.cwd() + '/data/storage'));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'index.html')));
 
-app.listen(4004, () => console.log('Server is started.'));
+app.listen(PORT, () => console.log(`Server is listening port ${PORT}`));

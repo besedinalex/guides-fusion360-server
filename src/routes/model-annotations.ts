@@ -1,15 +1,11 @@
 import express from 'express';
-import {selectModelAnnotations} from "../db/model-annotations";
-import ModelAnnotation from "../interfaces/model-annotation";
+import {getAllAnnotations} from "../services/model-annotations";
 
 const annotations = express.Router();
 
 annotations.get('/all', (req, res) => {
-    selectModelAnnotations(req.query.guideId).then((data: ModelAnnotation[]) => res.json(data));
-});
-
-annotations.post('/new', (req, res) => {
-    // TODO: Finish this.
+    const {guideId} = req.query;
+    getAllAnnotations(guideId, (code, json) => res.status(200).send(json));
 });
 
 export default annotations;
