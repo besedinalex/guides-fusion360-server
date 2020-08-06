@@ -1,14 +1,13 @@
 import jwt from "jsonwebtoken";
 import {selectUserAccess} from "../db/user";
-
-export const jwtSecret = 'Tolstikoff';
+const {SECRET} = require(process.cwd() + '/config.json');
 
 export function tokenToUserId(req, res, next) {
     const token = req.query.token;
     if (!token) {
         res.status(401).send('Unauthorized: No token provided');
     } else {
-        jwt.verify(token, jwtSecret, function (err, decoded) {
+        jwt.verify(token, SECRET, function (err, decoded) {
             if (err) {
                 res.status(401).send('Unauthorized: Invalid token');
             } else if (Date.now() >= decoded.exp * 1000) {

@@ -4,9 +4,9 @@ import path from 'path';
 import guides from './routes/guides';
 import user from './routes/user';
 import annotations from "./routes/model-annotations";
+const {PORT} = require(process.cwd() + '/config.json');
 
 const app = express();
-const port = 4004;
 
 // Some security stuff
 app.use(cors());
@@ -21,4 +21,4 @@ app.use('/', express.static(path.join(__dirname, '..', 'public')));
 app.use('/storage', express.static(process.cwd() + '/data/storage'));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'index.html')));
 
-app.listen(port, () => console.log(`Server is listening port ${port}`));
+app.listen(PORT, () => console.log(`Server is listening port ${PORT}`));

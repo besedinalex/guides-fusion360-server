@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import {decrypt, encrypt} from "../utils/crypto";
 import {insertNewUser, selectUserLoginData} from "../db/user";
-import {jwtSecret} from "../utils/access-check";
+const {SECRET} = require(process.cwd() + '/config.json');
 
 function getUserLoginData(email: string, password: string, result: (code: number, json: object) => void) {
     selectUserLoginData(email)
@@ -10,7 +10,7 @@ function getUserLoginData(email: string, password: string, result: (code: number
                 result(401, {message: 'Неверный email или пароль'});
             } else {
                 const payload = {id: user.id};
-                const token = jwt.sign(payload, jwtSecret, {expiresIn: '30d'});
+                const token = jwt.sign(payload, SECRET, {expiresIn: '30d'});
                 result(200, {token});
             }
         })
@@ -21,7 +21,7 @@ function createNewUser(email: string, password: string, firstName: string, lastN
     insertNewUser(email.toLowerCase(), firstName, lastName, group, encrypt(password))
         .then(userId => {
             const payload = {id: userId};
-            const token = jwt.sign(payload, jwtSecret, {expiresIn: '30d'});
+            const token = jwt.sign(payload, SECRET, {expiresIn: '30d'});
             result(200, {token});
         })
         .catch(() => result(409, {message: 'Пользователь с таким email уже существует'}));
