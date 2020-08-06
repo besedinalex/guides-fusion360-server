@@ -91,12 +91,10 @@ typings/
 .idea/
 dist/
 
-# Content data
+# Working data
 public/
 data/
+build/
 
 # System files
 .DS_Store
-
-# Executables
-guides-fusion360-server.exe
