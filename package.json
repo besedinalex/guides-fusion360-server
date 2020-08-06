@@ -5,9 +5,7 @@
   "bin": "dist/index.js",
   "scripts": {
     "start": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
-    "pretest": "ts-node-dev --transpileOnly tests/pretest.ts",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
-    "posttest": "ts-node-dev --transpileOnly tests/posttest.ts",
     "ts2js": "tsc",
     "sqlite-win-x64": "npm i sqlite3-simple-api --target_arch=x64",
     "build-win-x64": "pkg . --targets=node12-win-x64"
