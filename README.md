@@ -28,8 +28,6 @@ Run `python3 build.py` to build entire project. Files you need will be placed in
 
 Build options:
 
-`--npm_install=true` also runs `npm install` (it doesn't by default) if you just cloned projects and wanna build it asap.
-
 `--os=win` lets you choose targeted OS (Windows by default). Also supports `macos` and `linux`.
 
 `--arch=x64` lets you choose targeted processor architecture (x64 by default). Also supports `x86`.

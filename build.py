@@ -8,11 +8,9 @@ from distutils.dir_util import copy_tree
 parser = ArgumentParser(description='Build options.')
 parser.add_argument('-o', '--os', default='win')
 parser.add_argument('-a', '--arch', default='x64')
-parser.add_argument('-i', '--npm_install', default='false')
 args = vars(parser.parse_args())
 os = args['os']
 arch = args['arch']
-npm_install = args['npm_install']
 
 # Checks arguments
 if os != 'win' and os != 'macos' and os != 'linux':
@@ -23,8 +21,9 @@ if arch != 'x86' and arch != 'x64':
     quit()
 
 # Install dependencies
-if npm_install == 'true':
+if not path.isdir('./node_modules'):
     call('npm i', shell=True)
+if not path.isdir('./../guides-fusion360-client/node_modules'):
     call('npm i', shell=True, cwd='../guides-fusion360-client')
 
 # Builds client
@@ -35,14 +34,7 @@ if path.isdir('./public'):
     rmtree('./public')
 
 # Copies built client to server
-call('mkdir public', shell=True)
-for item in listdir('./../guides-fusion360-client/build'):
-    old_path = './../guides-fusion360-client/build/{}'.format(item)
-    new_path = './public/{}'.format(item)
-    if path.isfile(old_path) or path.islink(old_path):
-        copyfile(old_path, new_path)
-    elif path.isdir(old_path):
-        copy_tree(old_path, new_path)
+copy_tree('./../guides-fusion360-client/build', './../guides-fusion360-server/public')
 
 # Compiles proper sqlite3 for chosen OS and copies it to /build
 command = './node_modules/.bin/node-pre-gyp install --directory=./node_modules/sqlite3'
