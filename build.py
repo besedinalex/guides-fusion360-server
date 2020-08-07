@@ -32,7 +32,7 @@ call('npm run build', shell=True, cwd='../guides-fusion360-client')
 
 # Removes previous built client
 if path.isdir('./public'):
-    rmtree('./../guides-fusion360-server/public')
+    rmtree('./public')
 
 # Copies built client to server
 call('mkdir public', shell=True)
@@ -72,13 +72,13 @@ call(command, shell=True)
 
 # Copies sqlite3, exec and config to /build folder
 if path.isdir('./build'):
-    rmtree('./../guides-fusion360-server/build')
+    rmtree('./build')
 call('mkdir build', shell=True)
 copyfile(sqlite3_path, './build/node_sqlite3.node')
 copyfile('./config.json', './build/config.json')
 if os == 'win':
     copyfile('./guides-fusion360-server.exe', './build/FUSION360GUIDE.exe')
-    remove('./../guides-fusion360-server/guides-fusion360-server.exe')
+    remove('./guides-fusion360-server.exe')
 else:
     print('\nWARNING: Copy guides-fusion360-server file to /build folder.')
 
