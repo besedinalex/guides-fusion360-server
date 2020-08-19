@@ -7,15 +7,15 @@ namespace GuidesFusion360Server.Data
 {
     public static class GuidesDatabase
     {
-        public static async Task<List<GuideData>> SelectGuides(string hidden)
+        public static async Task<List<Guide>> SelectGuides(string hidden)
         {
             var sql = $"SELECT G.id, G.name, G.description FROM Guides AS G WHERE G.hidden='{hidden}'";
             var query = await Database.SelectAllData(sql);
 
-            var guides = new List<GuideData>();
+            var guides = new List<Guide>();
             foreach (var guide in query)
             {
-                guides.Add(new GuideData()
+                guides.Add(new Guide()
                 {
                     Id = Int32.Parse(guide[0]),
                     Name = guide[1],
@@ -34,17 +34,17 @@ namespace GuidesFusion360Server.Data
             return query[0];
         }
 
-        public static async Task<List<PartGuideData>> SelectPartGuides(int guideId)
+        public static async Task<List<PartGuide>> SelectPartGuides(int guideId)
         {
             var sql =
                 "SELECT PG.id, PG.name, PG.content, PG.sortKey FROM PartGuides as PG " +
                 $"WHERE PG.guideId = {guideId} ORDER BY PG.sortKey ASC";
             var query = await Database.SelectAllData(sql);
             
-            var guides = new List<PartGuideData>();
+            var guides = new List<PartGuide>();
             foreach (var guide in query)
             {
-                guides.Add(new PartGuideData()
+                guides.Add(new PartGuide()
                 {
                     Id = Int32.Parse(guide[0]),
                     Name = guide[1],
@@ -56,14 +56,14 @@ namespace GuidesFusion360Server.Data
             return guides;
         }
 
-        public static async Task<PartGuideData> SelectPartGuide(int id)
+        public static async Task<PartGuide> SelectPartGuide(int id)
         {
             var sql =
                 "SELECT PG.id, PG.name, PG.content, PG.sortKey, PG.guideId " +
                 $"FROM PartGuides as PG WHERE PG.id = {id}";
             var query = await Database.SelectRowData(sql);
 
-            return new PartGuideData()
+            return new PartGuide()
             {
                 Id = Int32.Parse(query[0]),
                 Name = query[1],

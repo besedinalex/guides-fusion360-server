@@ -18,14 +18,14 @@ namespace GuidesFusion360Server.Data
             };
         }
 
-        public static async Task<UserData> SelectUserData(int id)
+        public static async Task<User> SelectUserData(int id)
         {
             var sql =
                 "SELECT U.id, U.email, U.firstName, U.lastName, U.access, U.studyGroup " +
                 $"FROM Users AS U WHERE id={id}";
             var query = await Database.SelectRowData(sql);
 
-            return new UserData()
+            return new User()
             {
                 Id = Int32.Parse(query[0]),
                 Email = query[1],

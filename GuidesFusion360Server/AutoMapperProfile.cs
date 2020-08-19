@@ -8,8 +8,8 @@ namespace GuidesFusion360Server
     {
         public AutoMapperProfile()
         {
-            CreateMap<GuideData, GetAllGuidesDto>();
-            CreateMap<PartGuideData, GetAllPartGuidesDto>();
+            CreateMap<Guide, GetAllGuidesDto>();
+            CreateMap<PartGuide, GetAllPartGuidesDto>();
         }
     }
 }

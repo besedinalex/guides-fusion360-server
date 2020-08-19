@@ -1,6 +1,6 @@
 namespace GuidesFusion360Server.Models
 {
-    public class PartGuideData
+    public class PartGuide
     {
         public int Id { get; set; }
         
