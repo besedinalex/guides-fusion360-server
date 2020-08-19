@@ -1,3 +1,5 @@
+using AutoMapper;
+using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +12,9 @@ namespace GuidesFusion360Server
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<IGuidesService, GuidesService>();
         }
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -23,6 +28,7 @@ namespace GuidesFusion360Server
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Hello World!");

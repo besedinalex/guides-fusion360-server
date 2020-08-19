@@ -1,6 +1,6 @@
-namespace GuidesFusion360Server.Models
+namespace GuidesFusion360Server.Dtos
 {
-    public class PartGuideData
+    public class GetAllPartGuidesDto
     {
         public int Id { get; set; }
         
@@ -9,7 +9,5 @@ namespace GuidesFusion360Server.Models
         public string Content { get; set; }
         
         public int SortKey { get; set; }
-        
-        public int GuideId { get; set; }
     }
 }
