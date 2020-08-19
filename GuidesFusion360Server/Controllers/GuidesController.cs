@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using GuidesFusion360Server.Dtos;
 using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,9 +29,9 @@ namespace GuidesFusion360Server.Controllers
         }
 
         [HttpPost("guide")]
-        public async Task<IActionResult> CreateNewGuide(string name, string description)
+        public async Task<IActionResult> CreateNewGuide(AddNewGuideDto newGuide)
         {
-            return Ok(await _guidesService.CreateNewGuide(name, description, 0));
+            return Ok(await _guidesService.CreateNewGuide(0, newGuide));
         }
     }
 }

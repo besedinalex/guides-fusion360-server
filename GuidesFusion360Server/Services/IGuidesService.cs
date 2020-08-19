@@ -11,6 +11,6 @@ namespace GuidesFusion360Server.Services
         
         Task<ServiceResponse<List<GetAllPartGuidesDto>>> GetAllPartGuideData(int guideId);
 
-        Task<ServiceResponse<int>> CreateNewGuide(string name, string description, int ownerId);
+        Task<ServiceResponse<int>> CreateNewGuide(int ownerId, AddNewGuideDto newGuide);
     }
 }
