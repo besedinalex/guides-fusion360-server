@@ -20,7 +20,7 @@ namespace GuidesFusion360Server.Services
         public async Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllGuides()
         {
             var serviceResponse = new ServiceResponse<List<GetAllGuidesDto>>();
-            var guides = GuidesDatabase.SelectGuides("false");
+            var guides = await GuidesDatabase.SelectGuides("false");
             serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllGuidesDto>(c)).ToList();
             return serviceResponse;
         }
@@ -28,7 +28,7 @@ namespace GuidesFusion360Server.Services
         public async Task<ServiceResponse<List<GetAllPartGuidesDto>>> GetAllPartGuideData(int guideId)
         {
             var serviceResponse = new ServiceResponse<List<GetAllPartGuidesDto>>();
-            var guides = GuidesDatabase.SelectPartGuides(guideId);
+            var guides = await GuidesDatabase.SelectPartGuides(guideId);
             serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllPartGuidesDto>(c)).ToList();
             return serviceResponse;
         }
@@ -36,7 +36,7 @@ namespace GuidesFusion360Server.Services
         public async Task<ServiceResponse<int>> CreateNewGuide(string name, string description, int ownerId)
         {
             var serviceResponse = new ServiceResponse<int>();
-            var lastId = GuidesDatabase.InsertGuide(name, description, ownerId);
+            var lastId = await GuidesDatabase.InsertGuide(name, description, ownerId);
             serviceResponse.Data = lastId;
             serviceResponse.Message = "Guide is added.";
             return serviceResponse;

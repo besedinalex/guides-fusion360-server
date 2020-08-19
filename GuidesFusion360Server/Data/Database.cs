@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 
 namespace GuidesFusion360Server.Data
@@ -64,16 +64,16 @@ namespace GuidesFusion360Server.Data
         /// </summary>
         /// <param name="sqlQuery">Values are ordered the way the ary in a passed command.</param>
         /// <returns></returns>
-        public static List<string> SelectRowData(string sqlQuery)
-            => SelectData(sqlQuery, true) as List<string>;
+        public static async Task<List<string>> SelectRowData(string sqlQuery)
+            => await SelectData(sqlQuery, true) as List<string>;
 
         /// <summary>
         /// Returns all rows of select command.
         /// </summary>
         /// <param name="sqlQuery">Values are ordered the way the ary in a passed command.</param>
         /// <returns></returns>
-        public static List<List<string>> SelectAllData(string sqlQuery)
-            => SelectData(sqlQuery) as List<List<string>>;
+        public static async Task<List<List<string>>> SelectAllData(string sqlQuery)
+            => await SelectData(sqlQuery) as List<List<string>>;
 
         /// <summary>
         /// Lets you pass INSERT, UPDATE, DELETE commands.
@@ -83,17 +83,17 @@ namespace GuidesFusion360Server.Data
         /// Returns -1 on error occur.
         /// </param>
         /// <returns></returns>
-        public static int ChangeData(string sqlQuery)
+        public static async Task<int> ChangeData(string sqlQuery)
         {
-            using var db = new SqliteConnection($"Filename={DbPath}");
+            await using var db = new SqliteConnection($"Filename={DbPath}");
             db.Open();
-            using var command = new SqliteCommand(sqlQuery, db);
+            await using var command = new SqliteCommand(sqlQuery, db);
             long id;
             try
             {
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
                 command.CommandText = "SELECT last_insert_rowid();";
-                id = (Int64)command.ExecuteScalar();
+                id = (long) await command.ExecuteScalarAsync();
             }
             catch
             {
@@ -103,14 +103,14 @@ namespace GuidesFusion360Server.Data
             return (int)id;
         }
         
-        private static object SelectData(string sqlQuery, bool firstRowOnly = false)
+        private static async Task<object> SelectData(string sqlQuery, bool firstRowOnly = false)
         {
-            using var db = new SqliteConnection($"Filename={DbPath}");
+            await using var db = new SqliteConnection($"Filename={DbPath}");
             db.Open();
-            using var command = new SqliteCommand(sqlQuery, db);
+            await using var command = new SqliteCommand(sqlQuery, db);
 
             var data = new List<List<string>>();
-            var results = command.ExecuteReader();
+            var results = await command.ExecuteReaderAsync();
             while (results.Read())
             {
                 var result = new List<string>();

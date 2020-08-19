@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GuidesFusion360Server.Models;
 
 namespace GuidesFusion360Server.Data
 {
     public static class GuidesDatabase
     {
-        public static List<GuideData> SelectGuides(string hidden)
+        public static async Task<List<GuideData>> SelectGuides(string hidden)
         {
             var sql = $"SELECT G.id, G.name, G.description FROM Guides AS G WHERE G.hidden='{hidden}'";
-            var query = Database.SelectAllData(sql);
+            var query = await Database.SelectAllData(sql);
 
             var guides = new List<GuideData>();
             foreach (var guide in query)
@@ -25,20 +26,20 @@ namespace GuidesFusion360Server.Data
             return guides;
         }
 
-        public static string SelectGuideAccess(int id)
+        public static async Task<string> SelectGuideAccess(int id)
         {
             var sql = $"SELECT G.hidden FROM Guides AS G WHERE G.id={id}";
-            var query = Database.SelectRowData(sql);
+            var query = await Database.SelectRowData(sql);
 
             return query[0];
         }
 
-        public static List<PartGuideData> SelectPartGuides(int guideId)
+        public static async Task<List<PartGuideData>> SelectPartGuides(int guideId)
         {
             var sql =
                 "SELECT PG.id, PG.name, PG.content, PG.sortKey FROM PartGuides as PG " +
                 $"WHERE PG.guideId = {guideId} ORDER BY PG.sortKey ASC";
-            var query = Database.SelectAllData(sql);
+            var query = await Database.SelectAllData(sql);
             
             var guides = new List<PartGuideData>();
             foreach (var guide in query)
@@ -55,12 +56,12 @@ namespace GuidesFusion360Server.Data
             return guides;
         }
 
-        public static PartGuideData SelectPartGuide(int id)
+        public static async Task<PartGuideData> SelectPartGuide(int id)
         {
             var sql =
                 "SELECT PG.id, PG.name, PG.content, PG.sortKey, PG.guideId " +
                 $"FROM PartGuides as PG WHERE PG.id = {id}";
-            var query = Database.SelectRowData(sql);
+            var query = await Database.SelectRowData(sql);
 
             return new PartGuideData()
             {
@@ -72,46 +73,46 @@ namespace GuidesFusion360Server.Data
             };
         }
 
-        public static int InsertGuide(string name, string description, int ownerId)
+        public static async Task<int> InsertGuide(string name, string description, int ownerId)
         {
             var sql =
                 "INSERT INTO Guides (name, description, ownerId, hidden) " +
                 $"VALUES ('{name}', '{description}', '{ownerId}', 'true')";
-            var lastId = Database.ChangeData(sql);
+            var lastId = await Database.ChangeData(sql);
 
             return lastId;
         }
 
-        public static int InsertPartGuide(int guideId, string name, string content, int sortKey)
+        public static async Task<int> InsertPartGuide(int guideId, string name, string content, int sortKey)
         {
             var sql =
                 "INSERT INTO PartGuides (guideId, name, content, sortKey) " +
                 $"VALUES ('{guideId}', '{name}', '{content}', '{sortKey}')";
-            var lastId = Database.ChangeData(sql);
+            var lastId = await Database.ChangeData(sql);
 
             return lastId;
         }
 
-        public static int UpdateGuideHidden(int id, string hidden)
+        public static async Task<int> UpdateGuideHidden(int id, string hidden)
         {
             var sql = $"UPDATE GUIDES SET hidden='{hidden}' WHERE id={id}";
-            var status = Database.ChangeData(sql);
+            var status = await Database.ChangeData(sql);
 
             return status;
         }
 
-        public static int UpdatePartGuide(int id, string name, string content)
+        public static async Task<int> UpdatePartGuide(int id, string name, string content)
         {
             var sql = $"UPDATE PartGuides SET name='{name}', content='{content}' WHERE id={id}";
-            var status = Database.ChangeData(sql);
+            var status = await Database.ChangeData(sql);
 
             return status;
         }
 
-        public static int UpdatePartGuideSortKey(int id, int sortKey)
+        public static async Task<int> UpdatePartGuideSortKey(int id, int sortKey)
         {
             var sql = $"UPDATE PartGuides SET sortKey='{sortKey}' WHERE id={id}";
-            var status = Database.ChangeData(sql);
+            var status = await Database.ChangeData(sql);
 
             return status;
         }
