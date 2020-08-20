@@ -14,9 +14,7 @@ namespace GuidesFusion360Server.Models
         
         [Required]
         public string LastName { get; set; }
-        
-        public string StudyGroup { get; set; }
-        
+
         [Required]
         public string Access { get; set; }
         

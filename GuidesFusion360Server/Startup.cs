@@ -27,6 +27,7 @@ namespace GuidesFusion360Server
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<IGuidesService, GuidesService>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
         }
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
