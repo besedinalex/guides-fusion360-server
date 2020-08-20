@@ -1,16 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using GuidesFusion360Server.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GuidesFusion360Server.Data
 {
     public class AuthRepository : IAuthRepository
     {
         private readonly DataContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AuthRepository(DataContext context)
+        public AuthRepository(DataContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
         
         public async Task<ServiceResponse<string>> Register(User user, string password)
@@ -31,7 +40,7 @@ namespace GuidesFusion360Server.Data
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             
-            serviceResponse.Data = user.Id.ToString();
+            serviceResponse.Data = CreateToken(user);
             return serviceResponse;
         }
 
@@ -46,7 +55,7 @@ namespace GuidesFusion360Server.Data
             }
             else
             {
-                serviceResponse.Data = user.Id.ToString();
+                serviceResponse.Data = CreateToken(user);
             }
 
             return serviceResponse;
@@ -74,6 +83,32 @@ namespace GuidesFusion360Server.Data
                 }
             }
             return true;
+        }
+
+        private string CreateToken(User user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Email)
+            };
+            
+            var key = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+            
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = credentials
+            };
+            
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            
+            return tokenHandler.WriteToken(token);
         }
     }
 }
