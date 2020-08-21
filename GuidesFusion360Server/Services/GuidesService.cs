@@ -29,7 +29,22 @@ namespace GuidesFusion360Server.Services
         public async Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllGuides()
         {
             var serviceResponse = new ServiceResponse<List<GetAllGuidesDto>>();
-            // TODO: Hidden should be false
+            var guides = await _context.Guides.Where(x => x.Hidden == "false").ToListAsync();
+            serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllGuidesDto>(c)).ToList();
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllHiddenGuides(int userId)
+        {
+            var serviceResponse = new ServiceResponse<List<GetAllGuidesDto>>();
+            var hasAccess = await _authRepo.UserIsEditor(userId);
+            if (!hasAccess)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User access should be editor or admin.";
+                return serviceResponse;
+            }
+
             var guides = await _context.Guides.Where(x => x.Hidden == "true").ToListAsync();
             serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllGuidesDto>(c)).ToList();
             return serviceResponse;
@@ -39,20 +54,10 @@ namespace GuidesFusion360Server.Services
         {
             var serviceResponse = new ServiceResponse<FileContentResult>();
 
-            var guide = await _context.Guides.FirstOrDefaultAsync(x => x.Id == guideId);
-
-            if (guide == null)
+            var (isAvailable, accessResponse, statusCode) = await GuideIsAvailable<FileContentResult>(guideId);
+            if (!isAvailable)
             {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "Guide with that id was not found.";
-                return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 404);
-            }
-
-            if (guide.Hidden == "true")
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "Guide with that id is not public.";
-                return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 401);
+                return new Tuple<ServiceResponse<FileContentResult>, int>(accessResponse, statusCode);
             }
 
             serviceResponse.Data = await _fileManager.GetFile(guideId, "preview.png", "image/png");
@@ -76,9 +81,34 @@ namespace GuidesFusion360Server.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetAllPartGuidesDto>>> GetAllPartGuideData(int guideId)
+        public async Task<Tuple<ServiceResponse<List<GetAllPartGuidesDto>>, int>> GetAllPublicPartGuides(int guideId)
         {
             var serviceResponse = new ServiceResponse<List<GetAllPartGuidesDto>>();
+
+            var (isAvailable, accessResponse, statusCode) = await GuideIsAvailable<List<GetAllPartGuidesDto>>(guideId);
+            if (!isAvailable)
+            {
+                return new Tuple<ServiceResponse<List<GetAllPartGuidesDto>>, int>(accessResponse, statusCode);
+            }
+            
+            var guides = await _context.PartGuides.Where(x => x.GuideId == guideId).ToListAsync();
+            serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllPartGuidesDto>(c)).ToList();
+            return new Tuple<ServiceResponse<List<GetAllPartGuidesDto>>, int>(serviceResponse, 200);
+        }
+
+        public async Task<ServiceResponse<List<GetAllPartGuidesDto>>> GetAllPrivatePartGuides(int guideId, int userId)
+        {
+            var serviceResponse = new ServiceResponse<List<GetAllPartGuidesDto>>();
+
+            var hasAccess = await _authRepo.UserIsEditor(userId);
+            
+            if (!hasAccess)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User access should be editor or admin.";
+                return serviceResponse;
+            }
+            
             var guides = await _context.PartGuides.Where(x => x.GuideId == guideId).ToListAsync();
             serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllPartGuidesDto>(c)).ToList();
             return serviceResponse;
@@ -108,6 +138,29 @@ namespace GuidesFusion360Server.Services
             serviceResponse.Data = guide.Id;
             serviceResponse.Message = "Guide is added.";
             return serviceResponse;
+        }
+
+        private async Task<Tuple<bool, ServiceResponse<T>, int>> GuideIsAvailable<T>(int guideId)
+        {
+            var serviceResponse = new ServiceResponse<T>();
+            
+            var guide = await _context.Guides.FirstOrDefaultAsync(x => x.Id == guideId);
+            
+            if (guide == null)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Guide with that id was not found.";
+                return new Tuple<bool, ServiceResponse<T>, int>(false, serviceResponse, 404);
+            }
+
+            if (guide.Hidden == "true")
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Guide with that id is not public. You should provide token to access it.";
+                return new Tuple<bool, ServiceResponse<T>, int>(false, serviceResponse, 401);
+            }
+
+            return new Tuple<bool, ServiceResponse<T>, int>(true, serviceResponse, 200);
         }
     }
 }

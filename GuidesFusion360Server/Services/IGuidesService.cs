@@ -11,11 +11,15 @@ namespace GuidesFusion360Server.Services
     {
         Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllGuides();
 
+        Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllHiddenGuides(int userId);
+
         Task<Tuple<ServiceResponse<FileContentResult>, int>> GetPublicGuidePreview(int guideId);
         
         Task<ServiceResponse<FileContentResult>> GetPrivateGuidePreview(int guideId, int userId);
         
-        Task<ServiceResponse<List<GetAllPartGuidesDto>>> GetAllPartGuideData(int guideId);
+        Task<Tuple<ServiceResponse<List<GetAllPartGuidesDto>>, int>> GetAllPublicPartGuides(int guideId);
+
+        Task<ServiceResponse<List<GetAllPartGuidesDto>>> GetAllPrivatePartGuides(int guideId, int userId);
 
         Task<ServiceResponse<int>> CreateNewGuide(int ownerId, AddNewGuideDto newGuide);
     }
