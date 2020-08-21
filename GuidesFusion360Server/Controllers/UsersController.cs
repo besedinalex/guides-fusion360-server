@@ -47,9 +47,11 @@ namespace GuidesFusion360Server.Controllers
 
             var serviceResponse = await _authRepo.Register(user, newUser.Password);
             
-            if(!serviceResponse.Success) {
+            if(!serviceResponse.Success)
+            {
                 return BadRequest(serviceResponse);
             }
+            
             return Ok(serviceResponse);
         }
     }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace GuidesFusion360Server.Controllers
 
         [AllowAnonymous]
         [HttpGet("parts")]
-        public async Task<IActionResult> GetAllPartGuides(int guideId)
+        public async Task<IActionResult> GetAllPartGuides([Required]int guideId)
         {
             return Ok(await _guidesService.GetAllPartGuideData(guideId));
         }
