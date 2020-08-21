@@ -11,6 +11,7 @@ namespace GuidesFusion360Server
             CreateMap<Guide, GetAllGuidesDto>();
             CreateMap<PartGuide, GetAllPartGuidesDto>();
             CreateMap<AddNewGuideDto, Guide>();
+            CreateMap<AddNewPartGuideDto, PartGuide>();
         }
     }
 }

@@ -108,14 +108,31 @@ namespace GuidesFusion360Server.Controllers
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
-            var serviceResponse = await _guidesService.CreateNewGuide(userId, newGuide);
+            var (serviceResponse, statusCode) = await _guidesService.CreateNewGuide(userId, newGuide);
 
-            if (!serviceResponse.Success)
+            return statusCode switch
             {
-                return BadRequest(serviceResponse);
-            }
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
 
-            return Ok(serviceResponse);
+        [DisableRequestSizeLimit]
+        [HttpPost("part-guide")]
+        public async Task<IActionResult> CreateNewPartGuide([FromForm] AddNewPartGuideDto newGuide)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) = await _guidesService.CreateNewPartGuide(userId, newGuide);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
         }
     }
 }

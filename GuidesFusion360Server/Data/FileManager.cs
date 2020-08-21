@@ -20,6 +20,12 @@ namespace GuidesFusion360Server.Data
             Directory.CreateDirectory(_storage);
         }
 
+        public bool FileExists(int guideId, string fileName)
+        {
+            var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
+            return File.Exists(filePath);
+        }
+        
         public async Task<int> SaveFile(int guideId, string fileName, IFormFile file)
         {
             var guideFolder = Path.Combine(_storage, guideId.ToString());
