@@ -98,9 +98,9 @@ namespace GuidesFusion360Server.Controllers
                     {
                         return Ok(serviceResponse);
                     }
+                default: // 200
+                    return Ok(serviceResponse);
             }
-
-            return Ok(await _guidesService.GetAllPublicPartGuides(guideId));
         }
 
         [HttpPost("guide")]
