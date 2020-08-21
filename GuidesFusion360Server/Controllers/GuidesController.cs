@@ -31,7 +31,7 @@ namespace GuidesFusion360Server.Controllers
         [HttpGet("all-hidden")]
         public async Task<IActionResult> GetAllHiddenGuides()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             var serviceResponse = await _guidesService.GetAllHiddenGuides(userId);
             if (!serviceResponse.Success)
             {
@@ -53,7 +53,7 @@ namespace GuidesFusion360Server.Controllers
                 case 401:
                     try
                     {
-                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!
                             .Value);
                         serviceResponse = await _guidesService.GetPrivateGuidePreview(guideId, userId);
                         if (!serviceResponse.Success)
@@ -84,7 +84,7 @@ namespace GuidesFusion360Server.Controllers
                 case 401:
                     try
                     {
-                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!
                             .Value);
                         serviceResponse = await _guidesService.GetAllPrivatePartGuides(guideId, userId);
                         if (!serviceResponse.Success)
@@ -106,7 +106,7 @@ namespace GuidesFusion360Server.Controllers
         [HttpPost("guide")]
         public async Task<IActionResult> CreateNewGuide([FromForm] AddNewGuideDto newGuide)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
             var serviceResponse = await _guidesService.CreateNewGuide(userId, newGuide);
 
