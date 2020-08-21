@@ -64,6 +64,20 @@ namespace GuidesFusion360Server.Data
         public async Task<bool> UserExists(string email) =>
             await _context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
 
+        public async Task<bool> UserIsEditor(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+            return user != null && (user.Access == "editor" || user.Access == "admin");
+        }
+
+        public async Task<bool> UserIsAdmin(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+            return user != null && user.Access == "admin";
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using var hmac = new System.Security.Cryptography.HMACSHA512();

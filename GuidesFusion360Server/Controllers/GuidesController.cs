@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -29,17 +29,58 @@ namespace GuidesFusion360Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("parts")]
-        public async Task<IActionResult> GetAllPartGuides([Required]int guideId)
+        [HttpGet("preview/{guideId}")]
+        public async Task<IActionResult> GetGuidePreview(int guideId)
+        {
+            var (serviceResponse, statusCode) = await _guidesService.GetPublicGuidePreview(guideId);
+
+            switch (statusCode)
+            {
+                case 404:
+                    return NotFound(serviceResponse);
+                case 401:
+                    try
+                    {
+                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+                        serviceResponse = await _guidesService.GetPrivateGuidePreview(guideId, userId);
+                        if (!serviceResponse.Success)
+                        {
+                            return Unauthorized(serviceResponse);
+                        }
+
+                        return serviceResponse.Data;
+                    }
+                    catch
+                    {
+                        serviceResponse.Message = "You should authenticate to proceed.";
+                        return BadRequest(serviceResponse);
+                    }
+                default: // 200
+                    return serviceResponse.Data;
+            }
+
+        }
+
+        [AllowAnonymous]
+        [HttpGet("parts/{guideId}")]
+        public async Task<IActionResult> GetAllPartGuides(int guideId)
         {
             return Ok(await _guidesService.GetAllPartGuideData(guideId));
         }
 
         [HttpPost("guide")]
-        public async Task<IActionResult> CreateNewGuide(AddNewGuideDto newGuide)
+        public async Task<IActionResult> CreateNewGuide([FromForm]AddNewGuideDto newGuide)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-            return Ok(await _guidesService.CreateNewGuide(userId, newGuide));
+            
+            var serviceResponse = await _guidesService.CreateNewGuide(userId, newGuide);
+
+            if (!serviceResponse.Success)
+            {
+                return BadRequest(serviceResponse);
+            }
+
+            return Ok(serviceResponse);
         }
     }
 }

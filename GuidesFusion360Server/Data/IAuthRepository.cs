@@ -10,5 +10,9 @@ namespace GuidesFusion360Server.Data
         Task<ServiceResponse<string>> Login(string email, string password);
         
         Task<bool> UserExists(string email);
+
+        Task<bool> UserIsEditor(int id);
+
+        Task<bool> UserIsAdmin(int id);
     }
 }

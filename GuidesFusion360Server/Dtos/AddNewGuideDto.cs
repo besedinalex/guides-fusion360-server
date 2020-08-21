@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace GuidesFusion360Server.Dtos
 {
@@ -9,5 +10,8 @@ namespace GuidesFusion360Server.Dtos
         
         [Required]
         public string Description { get; set; }
+        
+        [Required]
+        public IFormFile Image { get; set; }
     }
 }
