@@ -41,6 +41,7 @@ namespace GuidesFusion360Server.Data
             await _context.SaveChangesAsync();
             
             serviceResponse.Data = CreateToken(user);
+            serviceResponse.Message = "User is successfully created.";
             return serviceResponse;
         }
 

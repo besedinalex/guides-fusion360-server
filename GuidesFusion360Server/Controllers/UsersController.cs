@@ -13,7 +13,7 @@ namespace GuidesFusion360Server.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IAuthRepository _authRepo;
-        
+
         public UsersController(IAuthRepository authRepository)
         {
             _authRepo = authRepository;
@@ -32,7 +32,7 @@ namespace GuidesFusion360Server.Controllers
 
             return Ok(serviceResponse);
         }
-        
+
         [AllowAnonymous]
         [HttpPost("new")]
         public async Task<IActionResult> CreateNewUser(UserRegisterDto newUser)
@@ -46,12 +46,12 @@ namespace GuidesFusion360Server.Controllers
             };
 
             var serviceResponse = await _authRepo.Register(user, newUser.Password);
-            
-            if(!serviceResponse.Success)
+
+            if (!serviceResponse.Success)
             {
                 return BadRequest(serviceResponse);
             }
-            
+
             return Ok(serviceResponse);
         }
     }
