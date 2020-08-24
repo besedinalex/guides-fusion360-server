@@ -24,5 +24,7 @@ namespace GuidesFusion360Server.Services
         Task<Tuple<ServiceResponse<int>, int>> CreateNewGuide(int ownerId, AddNewGuideDto newGuide);
 
         Task<Tuple<ServiceResponse<int>, int>> CreateNewPartGuide(int ownerId, AddNewPartGuideDto newGuide);
+
+        Task<Tuple<ServiceResponse<object>, int>> UploadModel(int ownerId, AddNewGuideModelDto newModel);
     }
 }

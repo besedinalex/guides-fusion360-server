@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using GuidesFusion360Server.Data;
@@ -13,17 +16,27 @@ namespace GuidesFusion360Server.Services
 {
     public class GuidesService : IGuidesService
     {
+        private class ConverterResponse
+        {
+            public string content { get; set; }
+            
+            public string thumbnail { get; set; }
+        }
+        
         private readonly IMapper _mapper;
         private readonly DataContext _context;
         private readonly IAuthRepository _authRepo;
         private readonly IFileManager _fileManager;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public GuidesService(IMapper mapper, DataContext context, IAuthRepository authRepo, IFileManager fileManager)
+        public GuidesService(IMapper mapper, DataContext context, IAuthRepository authRepo, IFileManager fileManager,
+            IHttpClientFactory clientFactory)
         {
             _mapper = mapper;
             _context = context;
             _authRepo = authRepo;
             _fileManager = fileManager;
+            _clientFactory = clientFactory;
         }
 
         public async Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllGuides()
@@ -60,7 +73,8 @@ namespace GuidesFusion360Server.Services
                 return new Tuple<ServiceResponse<FileContentResult>, int>(accessResponse, statusCode);
             }
 
-            serviceResponse.Data = await _fileManager.GetFile(guideId, "preview.png", "image/png");
+            var file = await _fileManager.GetFile(guideId, "preview.png");
+            serviceResponse.Data = new FileContentResult(file, "image/png");
             return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 200);
         }
 
@@ -77,7 +91,8 @@ namespace GuidesFusion360Server.Services
                 return serviceResponse;
             }
 
-            serviceResponse.Data = await _fileManager.GetFile(guideId, "preview.png", "image/png");
+            var file = await _fileManager.GetFile(guideId, "preview.png");
+            serviceResponse.Data = new FileContentResult(file, "image/png");
             return serviceResponse;
         }
 
@@ -210,6 +225,41 @@ namespace GuidesFusion360Server.Services
             serviceResponse.Data = guide.Id;
             serviceResponse.Message = "Part guide is successfully added.";
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
+        }
+
+        public async Task<Tuple<ServiceResponse<object>, int>> UploadModel(int ownerId, AddNewGuideModelDto newModel)
+        {
+            throw new NotImplementedException();
+            
+            var serviceResponse = new ServiceResponse<object>();
+
+            var (isEditable, accessResponse, statusCode) = await GuideIsEditable<object>(ownerId, newModel.GuideId);
+            if (!isEditable)
+            {
+                return new Tuple<ServiceResponse<object>, int>(accessResponse, statusCode);
+            }
+
+            var file = newModel.File;
+
+            await _fileManager.SaveFile(newModel.GuideId, "model.stp", file);
+            var stpFs = _fileManager.GetFileStream(newModel.GuideId, "model.stp");
+
+            using var formData = new MultipartFormDataContent("12345");
+            // formData.Headers.ContentType.MediaType = "multipart/form-data";
+            // formData.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
+            formData.Add(new StreamContent(stpFs), "file", "model.stp");
+            formData.Add(new StringContent("stp"), "from");
+            formData.Add(new StringContent("glb"), "to");
+            // formData.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=12345");
+            
+            
+            using var client = _clientFactory.CreateClient("converter");
+            var response = await client.PostAsync("/model", formData);
+            
+            serviceResponse.Data = await response.Content.ReadAsStringAsync();  
+            return new Tuple<ServiceResponse<object>, int>(serviceResponse, 200);
+            
+            // await _fileManager.SaveFile(newModel.GuideId, "model.glb", file);
         }
 
         private async Task<Tuple<bool, ServiceResponse<T>, int>> GuideIsAvailable<T>(int guideId)

@@ -1,6 +1,6 @@
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GuidesFusion360Server.Data
 {
@@ -10,6 +10,10 @@ namespace GuidesFusion360Server.Data
 
         Task<int> SaveFile(int guideId, string fileName, IFormFile file);
 
-        Task<FileContentResult> GetFile(int guideId, string fileName, string contentType);
+        Task<byte[]> GetFile(int guideId, string fileName);
+
+        FileStream GetFileStream(int guideId, string fileName);
+
+        int DeleteFile(int guideId, string fileName);
     }
 }

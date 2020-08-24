@@ -1,3 +1,5 @@
+using System;
+using System.Net.Http.Headers;
 using System.Text;
 using AutoMapper;
 using GuidesFusion360Server.Data;
@@ -16,11 +18,11 @@ namespace GuidesFusion360Server
 {
     public class Startup
     {
-        private readonly IConfiguration Configuration;
+        private readonly IConfiguration _configuration;
 
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
         
         public void ConfigureServices(IServiceCollection services)
@@ -32,13 +34,18 @@ namespace GuidesFusion360Server
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
-                            .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+                            .GetBytes(_configuration.GetSection("AppSettings:Token").Value)),
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
                 });
+            services.AddHttpClient("converter", c =>
+            {
+                c.BaseAddress = new Uri($"{_configuration.GetSection("AppSettings:ConverterUrl").Value}");
+                // c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("multipart/form-data"));
+            });
             services.AddDbContext<DataContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<IGuidesService, GuidesService>();

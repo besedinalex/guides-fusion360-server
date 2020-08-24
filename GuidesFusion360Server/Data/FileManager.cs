@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GuidesFusion360Server.Data
 {
@@ -37,11 +36,25 @@ namespace GuidesFusion360Server.Data
             return 1;
         }
 
-        public async Task<FileContentResult> GetFile(int guideId, string fileName, string contentType)
+        public async Task<byte[]> GetFile(int guideId, string fileName)
         {
-            var imagePath = Path.Combine(_storage, guideId.ToString(), fileName);
-            var image = await File.ReadAllBytesAsync(imagePath);
-            return new FileContentResult(image, contentType);
+            var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
+            var file = await File.ReadAllBytesAsync(filePath);
+            return file;
+        }
+
+        public FileStream GetFileStream(int guideId, string fileName)
+        {
+            var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
+            var fs = File.OpenRead(filePath);
+            return fs;
+        }
+
+        public int DeleteFile(int guideId, string fileName)
+        {
+            var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
+            File.Delete(filePath);
+            return 0;
         }
     }
 }
