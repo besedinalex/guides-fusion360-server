@@ -185,5 +185,53 @@ namespace GuidesFusion360Server.Controllers
                 _ => Ok(serviceResponse)
             };
         }
+
+        [HttpPut("switch")]
+        public async Task<IActionResult> SwitchPartGuides([Required] int partGuideId1, [Required] int partGuideId2)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) = await _guidesService.SwitchPartGuides(userId, partGuideId1, partGuideId2);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
+        [HttpDelete("guide/{guideId}")]
+        public async Task<IActionResult> RemoveGuide([Required] int guideId)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            
+            var (serviceResponse, statusCode) = await _guidesService.RemoveGuide(userId, guideId);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
+        [HttpDelete("part-guide/{id}")]
+        public async Task<IActionResult> RemovePartGuide([Required] int id)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            
+            var (serviceResponse, statusCode) = await _guidesService.RemovePartGuide(userId, id);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
     }
 }
