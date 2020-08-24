@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GuidesFusion360Server.Data;
 using GuidesFusion360Server.Dtos;
@@ -21,9 +22,9 @@ namespace GuidesFusion360Server.Controllers
 
         [AllowAnonymous]
         [HttpGet("token")]
-        public async Task<IActionResult> GetUserToken(UserLoginDto loginData)
+        public async Task<IActionResult> GetUserToken([Required] string email, [Required] string password)
         {
-            var serviceResponse = await _authRepo.Login(loginData.Email, loginData.Password);
+            var serviceResponse = await _authRepo.Login(email, password);
 
             if (!serviceResponse.Success)
             {
