@@ -152,5 +152,38 @@ namespace GuidesFusion360Server.Controllers
                 _ => Ok(serviceResponse)
             };
         }
+
+        [HttpPut("hidden/{guideId}")]
+        public async Task<IActionResult> ChangeGuideVisibility([Required] int guideId, [Required] string hidden)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            
+            var (serviceResponse, statusCode) = await _guidesService.ChangeGuideVisibility(userId, guideId, hidden);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
+        [DisableRequestSizeLimit]
+        [HttpPut("part-guide/{id}")]
+        public async Task<IActionResult> UpdatePartGuide([Required]int id, [FromForm] UpdatePartGuideDto updatedGuide)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) = await _guidesService.UpdatePartGuide(userId, id, updatedGuide);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
     }
 }
