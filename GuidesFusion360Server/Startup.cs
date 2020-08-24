@@ -27,6 +27,7 @@ namespace GuidesFusion360Server
         
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -65,7 +66,8 @@ namespace GuidesFusion360Server
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
