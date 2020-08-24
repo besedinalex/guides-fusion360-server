@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -43,7 +44,7 @@ namespace GuidesFusion360Server.Controllers
 
         [AllowAnonymous]
         [HttpGet("preview/{guideId}")]
-        public async Task<IActionResult> GetGuidePreview(int guideId)
+        public async Task<IActionResult> GetGuidePreview([Required]int guideId)
         {
             var (serviceResponse, statusCode) = await _guidesService.GetPublicGuidePreview(guideId);
             switch (statusCode)
@@ -74,7 +75,7 @@ namespace GuidesFusion360Server.Controllers
 
         [AllowAnonymous]
         [HttpGet("parts/{guideId}")]
-        public async Task<IActionResult> GetAllPartGuides(int guideId)
+        public async Task<IActionResult> GetAllPartGuides([Required]int guideId)
         {
             var (serviceResponse, statusCode) = await _guidesService.GetAllPublicPartGuides(guideId);
             switch (statusCode)
@@ -92,11 +93,11 @@ namespace GuidesFusion360Server.Controllers
                             return Unauthorized(serviceResponse);
                         }
 
-                        return BadRequest(serviceResponse);
+                        return Ok(serviceResponse);
                     }
                     catch
                     {
-                        return Ok(serviceResponse);
+                        return BadRequest(serviceResponse);
                     }
                 default: // 200
                     return Ok(serviceResponse);
