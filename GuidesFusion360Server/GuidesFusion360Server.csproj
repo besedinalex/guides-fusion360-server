@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.7" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.7" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.7" />
+      <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.7.1" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Storage\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Storage\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Storage\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Storage\**" />
+    </ItemGroup>
+
+</Project>
