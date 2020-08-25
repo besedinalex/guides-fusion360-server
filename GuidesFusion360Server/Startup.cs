@@ -55,24 +55,15 @@ namespace GuidesFusion360Server
                 var context = serviceScope.ServiceProvider.GetRequiredService<DataContext>();
                 context.Database.Migrate();
             }
-            
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            
+
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
-            });
+                endpoints.MapControllers());
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
         }
     }
 }

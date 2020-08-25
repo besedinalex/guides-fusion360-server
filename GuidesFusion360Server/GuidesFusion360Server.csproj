@@ -30,4 +30,8 @@
       <Content Remove="Storage\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot" />
+    </ItemGroup>
+
 </Project>
