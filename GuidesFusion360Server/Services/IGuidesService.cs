@@ -25,7 +25,7 @@ namespace GuidesFusion360Server.Services
 
         Task<Tuple<ServiceResponse<int>, int>> CreateNewPartGuide(int ownerId, AddNewPartGuideDto newPartGuide);
 
-        Task<Tuple<ServiceResponse<object>, int>> UploadModel(int userId, AddNewGuideModelDto newModel);
+        Task<Tuple<ServiceResponse<int>, int>> UploadModel(int userId, AddNewGuideModelDto newModel);
 
         Task<Tuple<ServiceResponse<int>, int>> ChangeGuideVisibility(int userId, int guideId, string hidden);
 

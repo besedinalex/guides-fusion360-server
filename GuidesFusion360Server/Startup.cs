@@ -28,23 +28,17 @@ namespace GuidesFusion360Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => 
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
-                            .GetBytes(_configuration.GetSection("AppSettings:Token").Value)),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
+                        .GetBytes(_configuration.GetSection("AppSettings:Token").Value)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
                 });
             services.AddHttpClient("converter", c =>
-            {
-                c.BaseAddress = new Uri($"{_configuration.GetSection("AppSettings:ConverterUrl").Value}");
-                // c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("multipart/form-data"));
-            });
+                c.BaseAddress = new Uri($"{_configuration.GetSection("AppSettings:ConverterUrl").Value}"));
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();

@@ -9,11 +9,11 @@ namespace GuidesFusion360Server.Data
         bool FileExists(int guideId, string fileName);
 
         Task<int> SaveFile(int guideId, string fileName, IFormFile file);
+        
+        Task<int> SaveFile(int guideId, string fileName, byte[] file);
 
         Task<byte[]> GetFile(int guideId, string fileName);
 
-        FileStream GetFileStream(int guideId, string fileName);
-
-        int DeleteFile(int guideId, string fileName);
+        void DeleteFile(int guideId, string fileName);
     }
 }

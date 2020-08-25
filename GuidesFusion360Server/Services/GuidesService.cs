@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using GuidesFusion360Server.Data;
@@ -11,18 +9,12 @@ using GuidesFusion360Server.Dtos;
 using GuidesFusion360Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace GuidesFusion360Server.Services
 {
     public class GuidesService : IGuidesService
     {
-        private class ConverterResponse
-        {
-            public string content { get; set; }
-            
-            public string thumbnail { get; set; }
-        }
-        
         private readonly IMapper _mapper;
         private readonly DataContext _context;
         private readonly IAuthRepository _authRepo;
@@ -244,39 +236,43 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
-        public async Task<Tuple<ServiceResponse<object>, int>> UploadModel(int userId, AddNewGuideModelDto newModel)
+        public async Task<Tuple<ServiceResponse<int>, int>> UploadModel(int userId, AddNewGuideModelDto newModel)
         {
-            throw new NotImplementedException();
-            
-            var serviceResponse = new ServiceResponse<object>();
+            var serviceResponse = new ServiceResponse<int>();
 
-            var (isEditable, accessResponse, statusCode) = await GuideIsEditable<object>(userId, newModel.GuideId);
+            var (isEditable, accessResponse, statusCode) = await GuideIsEditable<int>(userId, newModel.GuideId);
             if (!isEditable)
             {
-                return new Tuple<ServiceResponse<object>, int>(accessResponse, statusCode);
+                return new Tuple<ServiceResponse<int>, int>(accessResponse, statusCode);
             }
-
-            var file = newModel.File;
-
-            await _fileManager.SaveFile(newModel.GuideId, "model.stp", file);
-            var stpFs = _fileManager.GetFileStream(newModel.GuideId, "model.stp");
-
-            using var formData = new MultipartFormDataContent("12345");
-            // formData.Headers.ContentType.MediaType = "multipart/form-data";
-            // formData.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
-            formData.Add(new StreamContent(stpFs), "file", "model.stp");
-            formData.Add(new StringContent("stp"), "from");
-            formData.Add(new StringContent("glb"), "to");
-            // formData.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=12345");
             
+            using var formData = new MultipartFormDataContent();
             
+            // File
+            var bodyFile = new StreamContent(newModel.File.OpenReadStream());
+            bodyFile.Headers.Add("Content-Type", "application/octet-stream");
+            bodyFile.Headers.Add("Content-Disposition", "form-data; name=\"file\"; filename=\"model.stp\"");
+            formData.Add(bodyFile, "file");
+            
+            // From
+            var extFrom = new StringContent("stp");
+            extFrom.Headers.Add("Content-Disposition", "form-data; name=\"from\"");
+            formData.Add(extFrom, "from");
+            
+            // To
+            var extTo = new StringContent("glb");
+            extTo.Headers.Add("Content-Disposition", "form-data; name=\"to\"");
+            formData.Add(extTo, "to");
+
             using var client = _clientFactory.CreateClient("converter");
             var response = await client.PostAsync("/model", formData);
-            
-            serviceResponse.Data = await response.Content.ReadAsStringAsync();  
-            return new Tuple<ServiceResponse<object>, int>(serviceResponse, 200);
-            
-            // await _fileManager.SaveFile(newModel.GuideId, "model.glb", file);
+            var data = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var glbModel = Convert.FromBase64String(data["output"].ToString());
+
+            await _fileManager.SaveFile(newModel.GuideId, "model.glb", glbModel);
+
+            serviceResponse.Data = newModel.GuideId;  
+            return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
         public async Task<Tuple<ServiceResponse<int>, int>> ChangeGuideVisibility(int userId, int guideId, string hidden)

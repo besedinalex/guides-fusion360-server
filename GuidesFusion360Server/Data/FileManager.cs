@@ -36,6 +36,16 @@ namespace GuidesFusion360Server.Data
             return 1;
         }
 
+        public async Task<int> SaveFile(int guideId, string fileName, byte[] file)
+        {
+            var guideFolder = Path.Combine(_storage, guideId.ToString());
+            Directory.CreateDirectory(guideFolder);
+            
+            var filePath = Path.Combine(guideFolder, fileName);
+            await File.WriteAllBytesAsync(filePath, file);
+            return 1;
+        }
+
         public async Task<byte[]> GetFile(int guideId, string fileName)
         {
             var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
@@ -43,18 +53,10 @@ namespace GuidesFusion360Server.Data
             return file;
         }
 
-        public FileStream GetFileStream(int guideId, string fileName)
-        {
-            var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
-            var fs = File.OpenRead(filePath);
-            return fs;
-        }
-
-        public int DeleteFile(int guideId, string fileName)
+        public void DeleteFile(int guideId, string fileName)
         {
             var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
             File.Delete(filePath);
-            return 0;
         }
     }
 }
