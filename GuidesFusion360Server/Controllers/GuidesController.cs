@@ -43,39 +43,8 @@ namespace GuidesFusion360Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("preview/{guideId}")]
-        public async Task<IActionResult> GetGuidePreview([Required]int guideId)
-        {
-            var (serviceResponse, statusCode) = await _guidesService.GetPublicGuidePreview(guideId);
-            switch (statusCode)
-            {
-                case 404:
-                    return NotFound(serviceResponse);
-                case 401:
-                    try
-                    {
-                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!
-                            .Value);
-                        serviceResponse = await _guidesService.GetPrivateGuidePreview(guideId, userId);
-                        if (!serviceResponse.Success)
-                        {
-                            return Unauthorized(serviceResponse);
-                        }
-
-                        return serviceResponse.Data;
-                    }
-                    catch
-                    {
-                        return BadRequest(serviceResponse);
-                    }
-                default: // 200
-                    return serviceResponse.Data;
-            }
-        }
-
-        [AllowAnonymous]
         [HttpGet("parts/{guideId}")]
-        public async Task<IActionResult> GetAllPartGuides([Required]int guideId)
+        public async Task<IActionResult> GetAllPartGuides([Required] int guideId)
         {
             var (serviceResponse, statusCode) = await _guidesService.GetAllPublicPartGuides(guideId);
             switch (statusCode)
@@ -101,6 +70,37 @@ namespace GuidesFusion360Server.Controllers
                     }
                 default: // 200
                     return Ok(serviceResponse);
+            }
+        }
+        
+        [AllowAnonymous]
+        [HttpGet("file/{guideId}")]
+        public async Task<IActionResult> GetGuideFile([Required] int guideId, [Required] string filename)
+        {
+            var (serviceResponse, statusCode) = await _guidesService.GetPublicGuideFile(guideId, filename);
+            switch (statusCode)
+            {
+                case 404:
+                    return NotFound(serviceResponse);
+                case 401:
+                    try
+                    {
+                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!
+                            .Value);
+                        serviceResponse = await _guidesService.GetPrivateGuideFile(guideId, filename, userId);
+                        if (!serviceResponse.Success)
+                        {
+                            return Unauthorized(serviceResponse);
+                        }
+
+                        return serviceResponse.Data;
+                    }
+                    catch
+                    {
+                        return BadRequest(serviceResponse);
+                    }
+                default: // 200
+                    return serviceResponse.Data;
             }
         }
         
@@ -171,7 +171,7 @@ namespace GuidesFusion360Server.Controllers
 
         [DisableRequestSizeLimit]
         [HttpPut("part-guide/{id}")]
-        public async Task<IActionResult> UpdatePartGuide([Required]int id, [FromForm] UpdatePartGuideDto updatedGuide)
+        public async Task<IActionResult> UpdatePartGuide([Required] int id, [FromForm] UpdatePartGuideDto updatedGuide)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 

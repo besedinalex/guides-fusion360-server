@@ -63,39 +63,6 @@ namespace GuidesFusion360Server.Services
             return serviceResponse;
         }
 
-        public async Task<Tuple<ServiceResponse<FileContentResult>, int>> GetPublicGuidePreview(int guideId)
-        {
-            var serviceResponse = new ServiceResponse<FileContentResult>();
-
-            var (isAvailable, accessResponse, statusCode) = await GuideIsAvailable<FileContentResult>(guideId);
-            if (!isAvailable)
-            {
-                return new Tuple<ServiceResponse<FileContentResult>, int>(accessResponse, statusCode);
-            }
-
-            var file = await _fileManager.GetFile(guideId, "preview.png");
-            serviceResponse.Data = new FileContentResult(file, "image/png");
-            return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 200);
-        }
-
-        public async Task<ServiceResponse<FileContentResult>> GetPrivateGuidePreview(int guideId, int userId)
-        {
-            var serviceResponse = new ServiceResponse<FileContentResult>();
-
-            var hasAccess = await _authRepo.UserIsEditor(userId);
-
-            if (!hasAccess)
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "User access should be editor or admin.";
-                return serviceResponse;
-            }
-
-            var file = await _fileManager.GetFile(guideId, "preview.png");
-            serviceResponse.Data = new FileContentResult(file, "image/png");
-            return serviceResponse;
-        }
-
         public async Task<Tuple<ServiceResponse<List<GetAllPartGuidesDto>>, int>> GetAllPublicPartGuides(int guideId)
         {
             var serviceResponse = new ServiceResponse<List<GetAllPartGuidesDto>>();
@@ -126,6 +93,62 @@ namespace GuidesFusion360Server.Services
 
             var guides = await _context.PartGuides.Where(x => x.GuideId == guideId).ToListAsync();
             serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllPartGuidesDto>(c)).ToList();
+            return serviceResponse;
+        }
+        
+        public async Task<Tuple<ServiceResponse<FileContentResult>, int>> GetPublicGuideFile(int guideId, string filename)
+        {
+            var serviceResponse = new ServiceResponse<FileContentResult>();
+
+            if (!_fileManager.FileExists(guideId, filename))
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "File is not found.";
+                return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 404);
+            }
+            
+            var (isAvailable, accessResponse, statusCode) = await GuideIsAvailable<FileContentResult>(guideId);
+            if (!isAvailable)
+            {
+                return new Tuple<ServiceResponse<FileContentResult>, int>(accessResponse, statusCode);
+            }
+
+            var file = await _fileManager.GetFile(guideId, filename);
+            var extension =  System.IO.Path.GetExtension(filename).ToLower();
+            var mimeType = extension switch
+            {
+                ".png" => "image/png",
+                ".pdf" => "application/pdf",
+                _ => "application/octet-stream"
+            };
+
+            serviceResponse.Data = new FileContentResult(file, mimeType);
+            return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 200);
+        }
+
+        public async Task<ServiceResponse<FileContentResult>> GetPrivateGuideFile(int guideId, string filename, int userId)
+        {
+            var serviceResponse = new ServiceResponse<FileContentResult>();
+
+            var hasAccess = await _authRepo.UserIsEditor(userId);
+
+            if (!hasAccess)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User access should be editor or admin.";
+                return serviceResponse;
+            }
+
+            var file = await _fileManager.GetFile(guideId, filename);
+            var extension =  System.IO.Path.GetExtension(filename).ToLower();
+            var mimeType = extension switch
+            {
+                ".png" => "image/png",
+                ".pdf" => "application/pdf",
+                _ => "application/octet-stream"
+            };
+            
+            serviceResponse.Data = new FileContentResult(file, mimeType);
             return serviceResponse;
         }
 
