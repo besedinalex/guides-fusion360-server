@@ -1,6 +1,6 @@
 # Beginner's guides to Fusion 360
 
-Web server for keeping guides data and making possible creating and editing them.
+Web server to keep guides and their files and make possible to create new and edit existing ones.
 
 ## Setup
 
