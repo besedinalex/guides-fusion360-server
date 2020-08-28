@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace GuidesFusion360Server.Data
 {
+    /// <inheritdoc />
     public class FileManager : IFileManager
     {
         private readonly string _storage;
@@ -19,12 +20,14 @@ namespace GuidesFusion360Server.Data
             Directory.CreateDirectory(_storage);
         }
 
+        /// <inheritdoc />
         public bool FileExists(int guideId, string fileName)
         {
             var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
             return File.Exists(filePath);
         }
-        
+
+        /// <inheritdoc />
         public async Task<int> SaveFile(int guideId, string fileName, IFormFile file)
         {
             var guideFolder = Path.Combine(_storage, guideId.ToString());
@@ -36,16 +39,18 @@ namespace GuidesFusion360Server.Data
             return 1;
         }
 
+        /// <inheritdoc />
         public async Task<int> SaveFile(int guideId, string fileName, byte[] file)
         {
             var guideFolder = Path.Combine(_storage, guideId.ToString());
             Directory.CreateDirectory(guideFolder);
-            
+
             var filePath = Path.Combine(guideFolder, fileName);
             await File.WriteAllBytesAsync(filePath, file);
             return 1;
         }
 
+        /// <inheritdoc />
         public async Task<byte[]> GetFile(int guideId, string fileName)
         {
             var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
@@ -53,6 +58,7 @@ namespace GuidesFusion360Server.Data
             return file;
         }
 
+        /// <inheritdoc />
         public void DeleteFile(int guideId, string fileName)
         {
             var filePath = Path.Combine(_storage, guideId.ToString(), fileName);

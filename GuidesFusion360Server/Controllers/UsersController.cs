@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GuidesFusion360Server.Controllers
 {
+    /// <summary>Controller for user requests.</summary>
     [Authorize]
     [ApiController]
     [Route("[controller]")]
@@ -19,7 +20,7 @@ namespace GuidesFusion360Server.Controllers
         {
             _authRepo = authRepository;
         }
-
+        
         [AllowAnonymous]
         [HttpGet("token")]
         public async Task<IActionResult> GetUserToken([Required] string email, [Required] string password)

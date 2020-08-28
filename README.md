@@ -8,6 +8,8 @@ Install .NET Core from [official site](https://dotnet.microsoft.com/download).
 
 Make sure that your CLI now handles `dotnet` command.
 
+Run `dotnet ef migrations add Init` so app could create database.
+
 ## Debug
 
 Run `cd GuidesFusion360Server`.
@@ -18,7 +20,7 @@ Run `dotnet run` or `dotnet watch run`.
 
 Proper way to deploy can be found in [official Microsoft documentation](https://docs.microsoft.com/en-us/dotnet/core/deploying/)  or [another their documentation](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/?view=aspnetcore-3.1).
 
-### Considering my app:
+### Easy way:
 
 1. Install Python 3 from [official site](https://www.python.org/downloads/).
 2. Make sure your CLI now handles `python` or `python3` commands.

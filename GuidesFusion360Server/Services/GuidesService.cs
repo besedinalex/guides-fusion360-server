@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GuidesFusion360Server.Services
 {
+    /// <inheritdoc />
     public class GuidesService : IGuidesService
     {
         private readonly IMapper _mapper;
@@ -31,6 +32,7 @@ namespace GuidesFusion360Server.Services
             _clientFactory = clientFactory;
         }
 
+        /// <inheritdoc />
         public async Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllGuides()
         {
             var serviceResponse = new ServiceResponse<List<GetAllGuidesDto>>();
@@ -39,6 +41,7 @@ namespace GuidesFusion360Server.Services
             return serviceResponse;
         }
 
+        /// <inheritdoc />
         public async Task<ServiceResponse<List<GetAllGuidesDto>>> GetAllHiddenGuides(int userId)
         {
             var serviceResponse = new ServiceResponse<List<GetAllGuidesDto>>();
@@ -55,6 +58,7 @@ namespace GuidesFusion360Server.Services
             return serviceResponse;
         }
 
+        /// <inheritdoc />
         public async Task<Tuple<ServiceResponse<List<GetAllPartGuidesDto>>, int>> GetAllPublicPartGuides(int guideId)
         {
             var serviceResponse = new ServiceResponse<List<GetAllPartGuidesDto>>();
@@ -70,6 +74,7 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<List<GetAllPartGuidesDto>>, int>(serviceResponse, 200);
         }
 
+        /// <inheritdoc />
         public async Task<ServiceResponse<List<GetAllPartGuidesDto>>> GetAllPrivatePartGuides(int guideId, int userId)
         {
             var serviceResponse = new ServiceResponse<List<GetAllPartGuidesDto>>();
@@ -87,8 +92,10 @@ namespace GuidesFusion360Server.Services
             serviceResponse.Data = guides.Select(c => _mapper.Map<GetAllPartGuidesDto>(c)).ToList();
             return serviceResponse;
         }
-        
-        public async Task<Tuple<ServiceResponse<FileContentResult>, int>> GetPublicGuideFile(int guideId, string filename)
+
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponse<FileContentResult>, int>> GetPublicGuideFile(int guideId,
+            string filename)
         {
             var serviceResponse = new ServiceResponse<FileContentResult>();
 
@@ -98,7 +105,7 @@ namespace GuidesFusion360Server.Services
                 serviceResponse.Message = "File is not found.";
                 return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 404);
             }
-            
+
             var (isAvailable, accessResponse, statusCode) = await GuideIsAvailable<FileContentResult>(guideId);
             if (!isAvailable)
             {
@@ -106,7 +113,7 @@ namespace GuidesFusion360Server.Services
             }
 
             var file = await _fileManager.GetFile(guideId, filename);
-            var extension =  System.IO.Path.GetExtension(filename).ToLower();
+            var extension = System.IO.Path.GetExtension(filename).ToLower();
             var mimeType = extension switch
             {
                 ".png" => "image/png",
@@ -118,7 +125,9 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<FileContentResult>, int>(serviceResponse, 200);
         }
 
-        public async Task<ServiceResponse<FileContentResult>> GetPrivateGuideFile(int guideId, string filename, int userId)
+        /// <inheritdoc />
+        public async Task<ServiceResponse<FileContentResult>> GetPrivateGuideFile(int guideId, string filename,
+            int userId)
         {
             var serviceResponse = new ServiceResponse<FileContentResult>();
 
@@ -132,23 +141,24 @@ namespace GuidesFusion360Server.Services
             }
 
             var file = await _fileManager.GetFile(guideId, filename);
-            var extension =  System.IO.Path.GetExtension(filename).ToLower();
+            var extension = System.IO.Path.GetExtension(filename).ToLower();
             var mimeType = extension switch
             {
                 ".png" => "image/png",
                 ".pdf" => "application/pdf",
                 _ => "application/octet-stream"
             };
-            
+
             serviceResponse.Data = new FileContentResult(file, mimeType);
             return serviceResponse;
         }
 
-        public async Task<Tuple<ServiceResponse<int>, int>> CreateNewGuide(int ownerId, AddNewGuideDto newGuide)
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponse<int>, int>> CreateNewGuide(int userId, AddNewGuideDto newGuide)
         {
             var serviceResponse = new ServiceResponse<int>();
 
-            var hasAccess = await _authRepo.UserIsEditor(ownerId);
+            var hasAccess = await _authRepo.UserIsEditor(userId);
             if (!hasAccess)
             {
                 serviceResponse.Success = false;
@@ -164,7 +174,7 @@ namespace GuidesFusion360Server.Services
             }
 
             var guide = _mapper.Map<Guide>(newGuide);
-            guide.OwnerId = ownerId;
+            guide.OwnerId = userId;
             guide.Hidden = "true";
 
             await _context.Guides.AddAsync(guide);
@@ -177,11 +187,13 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
-        public async Task<Tuple<ServiceResponse<int>, int>> CreateNewPartGuide(int ownerId, AddNewPartGuideDto newPartGuide)
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponse<int>, int>> CreateNewPartGuide(int userId,
+            AddNewPartGuideDto newPartGuide)
         {
             var serviceResponse = new ServiceResponse<int>();
 
-            var (isEditable, accessResponse, statusCode) = await GuideIsEditable<int>(ownerId, newPartGuide.GuideId);
+            var (isEditable, accessResponse, statusCode) = await GuideIsEditable<int>(userId, newPartGuide.GuideId);
             if (!isEditable)
             {
                 return new Tuple<ServiceResponse<int>, int>(accessResponse, statusCode);
@@ -206,7 +218,7 @@ namespace GuidesFusion360Server.Services
                 serviceResponse.Message = "You should provide valid URL in link field.";
                 return new Tuple<ServiceResponse<int>, int>(serviceResponse, 400);
             }
-            
+
             if (file != null)
             {
                 var isPdf = file.ContentType == "application/pdf";
@@ -236,6 +248,7 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
+        /// <inheritdoc />
         public async Task<Tuple<ServiceResponse<int>, int>> UploadModel(int userId, AddNewGuideModelDto newModel)
         {
             var serviceResponse = new ServiceResponse<int>();
@@ -245,20 +258,20 @@ namespace GuidesFusion360Server.Services
             {
                 return new Tuple<ServiceResponse<int>, int>(accessResponse, statusCode);
             }
-            
+
             using var formData = new MultipartFormDataContent();
-            
+
             // File
             var bodyFile = new StreamContent(newModel.File.OpenReadStream());
             bodyFile.Headers.Add("Content-Type", "application/octet-stream");
             bodyFile.Headers.Add("Content-Disposition", "form-data; name=\"file\"; filename=\"model.stp\"");
             formData.Add(bodyFile, "file");
-            
+
             // From
             var extFrom = new StringContent("stp");
             extFrom.Headers.Add("Content-Disposition", "form-data; name=\"from\"");
             formData.Add(extFrom, "from");
-            
+
             // To
             var extTo = new StringContent("glb");
             extTo.Headers.Add("Content-Disposition", "form-data; name=\"to\"");
@@ -271,11 +284,13 @@ namespace GuidesFusion360Server.Services
 
             await _fileManager.SaveFile(newModel.GuideId, "model.glb", glbModel);
 
-            serviceResponse.Data = newModel.GuideId;  
+            serviceResponse.Data = newModel.GuideId;
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
-        public async Task<Tuple<ServiceResponse<int>, int>> ChangeGuideVisibility(int userId, int guideId, string hidden)
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponse<int>, int>> ChangeGuideVisibility(int userId, int guideId,
+            string hidden)
         {
             var serviceResponse = new ServiceResponse<int>();
 
@@ -284,6 +299,8 @@ namespace GuidesFusion360Server.Services
             {
                 return new Tuple<ServiceResponse<int>, int>(accessResponse, statusCode);
             }
+
+            hidden = hidden.ToLower();
 
             if (hidden != "true" && hidden != "false")
             {
@@ -302,6 +319,7 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
+        /// <inheritdoc />
         public async Task<Tuple<ServiceResponse<int>, int>> UpdatePartGuide(int userId, int partGuideId,
             UpdatePartGuideDto updatedGuide)
         {
@@ -316,7 +334,7 @@ namespace GuidesFusion360Server.Services
             var name = updatedGuide.Name;
             var content = updatedGuide.Content;
             var file = updatedGuide.File;
-            
+
             if (file != null && content != null)
             {
                 serviceResponse.Success = false;
@@ -339,9 +357,10 @@ namespace GuidesFusion360Server.Services
                 {
                     _fileManager.DeleteFile(partGuide.GuideId, partGuide.Content);
                 }
+
                 partGuide.Content = content;
             }
-            
+
             if (file != null)
             {
                 var isPdf = file.ContentType == "application/pdf";
@@ -352,7 +371,7 @@ namespace GuidesFusion360Server.Services
                     serviceResponse.Message = "You should provide PDF or ZIP file or no files at all.";
                     return new Tuple<ServiceResponse<int>, int>(serviceResponse, 400);
                 }
-                
+
                 if (_fileManager.FileExists(partGuide.GuideId, file.FileName))
                 {
                     if (file.FileName != partGuide.Content)
@@ -361,13 +380,15 @@ namespace GuidesFusion360Server.Services
                         serviceResponse.Message = "File with this name already exists in this guide.";
                         return new Tuple<ServiceResponse<int>, int>(serviceResponse, 400);
                     }
+
                     await _fileManager.SaveFile(partGuide.GuideId, file.FileName, file);
                 }
-                
+
                 if (_fileManager.FileExists(partGuide.GuideId, partGuide.Content))
                 {
                     _fileManager.DeleteFile(partGuide.GuideId, partGuide.Content);
                 }
+
                 partGuide.Content = file.FileName;
                 await _fileManager.SaveFile(partGuide.GuideId, file.FileName, file);
             }
@@ -379,25 +400,27 @@ namespace GuidesFusion360Server.Services
 
             _context.PartGuides.Update(partGuide);
             await _context.SaveChangesAsync();
-            
+
             serviceResponse.Data = partGuide.Id;
             serviceResponse.Message = "Part guide is successfully updated.";
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
-        public async Task<Tuple<ServiceResponse<int>, int>> SwitchPartGuides(int userId, int partGuideId1, int partGuideId2)
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponse<int>, int>> SwitchPartGuides(int userId, int partGuideId1,
+            int partGuideId2)
         {
             var serviceResponse = new ServiceResponse<int>();
-            
+
             var (isEditable, accessResponse, statusCode) = await PartGuideIsEditable<int>(userId, partGuideId1);
             if (!isEditable)
             {
                 return new Tuple<ServiceResponse<int>, int>(accessResponse, statusCode);
             }
-            
+
             var partGuide1 = await _context.PartGuides.FirstOrDefaultAsync(x => x.Id == partGuideId1);
             var partGuide2 = await _context.PartGuides.FirstOrDefaultAsync(x => x.Id == partGuideId2);
-            
+
             if (partGuide2 == null)
             {
                 serviceResponse.Success = false;
@@ -424,10 +447,11 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
+        /// <inheritdoc />
         public async Task<Tuple<ServiceResponse<int>, int>> RemoveGuide(int userId, int guideId)
         {
             var serviceResponse = new ServiceResponse<int>();
-            
+
             var (isEditable, accessResponse, statusCode) = await GuideIsEditable<int>(userId, guideId, true);
             if (!isEditable)
             {
@@ -439,6 +463,7 @@ namespace GuidesFusion360Server.Services
             {
                 _context.PartGuides.Remove(partGuide);
             }
+
             var guide = await _context.Guides.FirstOrDefaultAsync(x => x.Id == guideId);
             _context.Guides.Remove(guide);
             await _context.SaveChangesAsync();
@@ -447,10 +472,11 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
+        /// <inheritdoc />
         public async Task<Tuple<ServiceResponse<int>, int>> RemovePartGuide(int userId, int partGuideId)
         {
             var serviceResponse = new ServiceResponse<int>();
-            
+
             var (isEditable, accessResponse, statusCode) = await PartGuideIsEditable<int>(userId, partGuideId, true);
             if (!isEditable)
             {
@@ -465,6 +491,10 @@ namespace GuidesFusion360Server.Services
             return new Tuple<ServiceResponse<int>, int>(serviceResponse, 200);
         }
 
+        /// <summary>Checks if guide is available for edit and if it exists at all.</summary>
+        /// <param name="guideId">Id of the guide.</param>
+        /// <typeparam name="T">Type of service response.</typeparam>
+        /// <returns>Returns service response and http code of response.</returns>
         private async Task<Tuple<bool, ServiceResponse<T>, int>> GuideIsAvailable<T>(int guideId)
         {
             var serviceResponse = new ServiceResponse<T>();
@@ -488,17 +518,26 @@ namespace GuidesFusion360Server.Services
             return new Tuple<bool, ServiceResponse<T>, int>(true, serviceResponse, 200);
         }
 
+        /// <summary>Checks if guide is editable with current access level.</summary>
+        /// <param name="userId">Id of the user who will edit the guide.</param>
+        /// <param name="guideId">Id of the guide.</param>
+        /// <param name="requiresAdminAccess">Checks if user should be editor or admin. False (editor) by default.</param>
+        /// <typeparam name="T">Type of service response.</typeparam>
+        /// <returns>Returns service response and http code of response.</returns>
         private async Task<Tuple<bool, ServiceResponse<T>, int>> GuideIsEditable<T>(int userId, int guideId,
             bool requiresAdminAccess = false)
         {
             var serviceResponse = new ServiceResponse<T>();
 
-            var hasAccess = requiresAdminAccess ? await _authRepo.UserIsAdmin(userId) : await _authRepo.UserIsEditor(userId);
+            var hasAccess = requiresAdminAccess
+                ? await _authRepo.UserIsAdmin(userId)
+                : await _authRepo.UserIsEditor(userId);
 
             if (!hasAccess)
             {
                 serviceResponse.Success = false;
-                serviceResponse.Message = $"User access should be {(requiresAdminAccess ? "admin." : "editor or admin.")}";
+                serviceResponse.Message =
+                    $"User access should be {(requiresAdminAccess ? "admin." : "editor or admin.")}";
                 return new Tuple<bool, ServiceResponse<T>, int>(false, serviceResponse, 401);
             }
 
@@ -521,13 +560,19 @@ namespace GuidesFusion360Server.Services
             return new Tuple<bool, ServiceResponse<T>, int>(true, serviceResponse, 200);
         }
 
+        /// <summary>Checks if part guide is editable with current access level.</summary>
+        /// <param name="userId">Id of the user who will edit the guide.</param>
+        /// <param name="partGuideId">Id of the part guide.</param>
+        /// <param name="requiresAdminAccess">Checks if user should be editor or admin. False (editor) by default.</param>
+        /// <typeparam name="T">Type of service response.</typeparam>
+        /// <returns>Returns service response and http code of response.</returns>
         private async Task<Tuple<bool, ServiceResponse<T>, int>> PartGuideIsEditable<T>(int userId, int partGuideId,
             bool requiresAdminAccess = false)
         {
             var serviceResponse = new ServiceResponse<T>();
 
             var partGuide = await _context.PartGuides.FirstOrDefaultAsync(x => x.Id == partGuideId);
-            
+
             if (partGuide == null)
             {
                 serviceResponse.Success = false;
