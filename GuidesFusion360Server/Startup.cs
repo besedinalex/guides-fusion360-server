@@ -57,13 +57,16 @@ namespace GuidesFusion360Server
             }
 
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
-                endpoints.MapControllers());
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            {
+                endpoints.MapControllers();
+                endpoints.MapFallbackToFile("/index.html");
+            });
         }
     }
 }
