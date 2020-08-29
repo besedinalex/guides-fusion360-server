@@ -43,9 +43,9 @@ namespace GuidesFusion360Server
                 options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton<IFileManager, FileManager>();
             services.AddScoped<IGuidesService, GuidesService>();
             services.AddScoped<IAuthRepository, AuthRepository>();
-            services.AddScoped<IFileManager, FileManager>();
         }
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
