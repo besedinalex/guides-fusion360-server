@@ -24,9 +24,9 @@ namespace GuidesFusion360Server.Data
         }
 
         /// <inheritdoc />
-        public async Task<ServiceResponse<string>> Register(User user, string password)
+        public async Task<ServiceResponseModel<string>> Register(UserModel user, string password)
         {
-            var serviceResponse = new ServiceResponse<string>();
+            var serviceResponse = new ServiceResponseModel<string>();
 
             if (await UserExists(user.Email))
             {
@@ -48,9 +48,9 @@ namespace GuidesFusion360Server.Data
         }
 
         /// <inheritdoc />
-        public async Task<ServiceResponse<string>> Login(string email, string password)
+        public async Task<ServiceResponseModel<string>> Login(string email, string password)
         {
-            var serviceResponse = new ServiceResponse<string>();
+            var serviceResponse = new ServiceResponseModel<string>();
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
             if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
@@ -121,7 +121,7 @@ namespace GuidesFusion360Server.Data
         /// <summary>Creates JWT token.</summary>
         /// <param name="user">User data.</param>
         /// <returns>Returns JWT token.</returns>
-        private string CreateToken(User user)
+        private string CreateToken(UserModel user)
         {
             var claims = new List<Claim>
             {

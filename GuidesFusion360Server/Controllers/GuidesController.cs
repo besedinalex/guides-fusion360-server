@@ -72,7 +72,7 @@ namespace GuidesFusion360Server.Controllers
                     return Ok(serviceResponse);
             }
         }
-        
+
         [AllowAnonymous]
         [HttpGet("file/{guideId}")]
         public async Task<IActionResult> GetGuideFile([Required] int guideId, [Required] string filename)
@@ -103,7 +103,7 @@ namespace GuidesFusion360Server.Controllers
                     return serviceResponse.Data;
             }
         }
-        
+
         [HttpPost("guide")]
         public async Task<IActionResult> CreateNewGuide([FromForm] AddNewGuideDto newGuide)
         {
@@ -141,7 +141,7 @@ namespace GuidesFusion360Server.Controllers
         public async Task<IActionResult> UploadModel([FromForm] AddNewGuideModelDto newModel)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-            
+
             var (serviceResponse, statusCode) = await _guidesService.UploadModel(userId, newModel);
 
             return statusCode switch
@@ -157,7 +157,7 @@ namespace GuidesFusion360Server.Controllers
         public async Task<IActionResult> ChangeGuideVisibility([Required] int guideId, [Required] string hidden)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-            
+
             var (serviceResponse, statusCode) = await _guidesService.ChangeGuideVisibility(userId, guideId, hidden);
 
             return statusCode switch
@@ -191,7 +191,8 @@ namespace GuidesFusion360Server.Controllers
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
-            var (serviceResponse, statusCode) = await _guidesService.SwitchPartGuides(userId, partGuideId1, partGuideId2);
+            var (serviceResponse, statusCode) =
+                await _guidesService.SwitchPartGuides(userId, partGuideId1, partGuideId2);
 
             return statusCode switch
             {
@@ -206,7 +207,7 @@ namespace GuidesFusion360Server.Controllers
         public async Task<IActionResult> RemoveGuide([Required] int guideId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-            
+
             var (serviceResponse, statusCode) = await _guidesService.RemoveGuide(userId, guideId);
 
             return statusCode switch
@@ -222,7 +223,7 @@ namespace GuidesFusion360Server.Controllers
         public async Task<IActionResult> RemovePartGuide([Required] int id)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-            
+
             var (serviceResponse, statusCode) = await _guidesService.RemovePartGuide(userId, id);
 
             return statusCode switch

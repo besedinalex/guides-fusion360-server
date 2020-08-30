@@ -16,15 +16,13 @@ namespace GuidesFusion360Server.Data
         /// <param name="guideId">Id of the guide.</param>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="file">File from body form.</param>
-        /// <returns>Returns 1 on success.</returns>
-        Task<int> SaveFile(int guideId, string fileName, IFormFile file);
-        
+        Task SaveFile(int guideId, string fileName, IFormFile file);
+
         /// <summary>Saves guide file.</summary>
         /// <param name="guideId">Id of the guide.</param>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="file">File from array of bytes.</param>
-        /// <returns>Returns 1 on success.</returns>
-        Task<int> SaveFile(int guideId, string fileName, byte[] file);
+        Task SaveFile(int guideId, string fileName, byte[] file);
 
         /// <summary>Returns file as byte array.</summary>
         /// <param name="guideId">Id of the guide.</param>

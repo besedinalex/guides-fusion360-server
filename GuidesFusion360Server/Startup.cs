@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http.Headers;
 using System.Text;
 using AutoMapper;
 using GuidesFusion360Server.Data;
@@ -7,11 +6,9 @@ using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GuidesFusion360Server
@@ -24,11 +21,11 @@ namespace GuidesFusion360Server
         {
             _configuration = configuration;
         }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -47,7 +44,7 @@ namespace GuidesFusion360Server
             services.AddScoped<IGuidesService, GuidesService>();
             services.AddScoped<IAuthRepository, AuthRepository>();
         }
-        
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())

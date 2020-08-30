@@ -28,7 +28,7 @@ namespace GuidesFusion360Server.Data
         }
 
         /// <inheritdoc />
-        public async Task<int> SaveFile(int guideId, string fileName, IFormFile file)
+        public async Task SaveFile(int guideId, string fileName, IFormFile file)
         {
             var guideFolder = Path.Combine(_storage, guideId.ToString());
             Directory.CreateDirectory(guideFolder);
@@ -36,26 +36,23 @@ namespace GuidesFusion360Server.Data
             var filePath = Path.Combine(guideFolder, fileName);
             await using var stream = new FileStream(filePath, FileMode.Create);
             await file.CopyToAsync(stream);
-            return 1;
         }
 
         /// <inheritdoc />
-        public async Task<int> SaveFile(int guideId, string fileName, byte[] file)
+        public Task SaveFile(int guideId, string fileName, byte[] file)
         {
             var guideFolder = Path.Combine(_storage, guideId.ToString());
             Directory.CreateDirectory(guideFolder);
 
             var filePath = Path.Combine(guideFolder, fileName);
-            await File.WriteAllBytesAsync(filePath, file);
-            return 1;
+            return File.WriteAllBytesAsync(filePath, file);
         }
 
         /// <inheritdoc />
-        public async Task<byte[]> GetFile(int guideId, string fileName)
+        public Task<byte[]> GetFile(int guideId, string fileName)
         {
             var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
-            var file = await File.ReadAllBytesAsync(filePath);
-            return file;
+            return File.ReadAllBytesAsync(filePath);
         }
 
         /// <inheritdoc />

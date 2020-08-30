@@ -20,7 +20,7 @@ namespace GuidesFusion360Server.Controllers
         {
             _authRepo = authRepository;
         }
-        
+
         [AllowAnonymous]
         [HttpGet("token")]
         public async Task<IActionResult> GetUserToken([Required] string email, [Required] string password)
@@ -39,7 +39,7 @@ namespace GuidesFusion360Server.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> CreateNewUser(UserRegisterDto newUser)
         {
-            var user = new User()
+            var user = new UserModel()
             {
                 Email = newUser.Email,
                 FirstName = newUser.FirstName,

@@ -10,13 +10,13 @@ namespace GuidesFusion360Server.Data
         /// <param name="user">User data.</param>
         /// <param name="password">User password.</param>
         /// <returns>Returns user token.</returns>
-        Task<ServiceResponse<string>> Register(User user, string password);
-        
+        Task<ServiceResponseModel<string>> Register(UserModel user, string password);
+
         /// <summary>Requests user token.</summary>
         /// <param name="email">User email.</param>
         /// <param name="password">User password.</param>
         /// <returns>Returns user token.</returns>
-        Task<ServiceResponse<string>> Login(string email, string password);
+        Task<ServiceResponseModel<string>> Login(string email, string password);
 
         /// <summary>Checks if user is editor or admin.</summary>
         /// <param name="userId">Id of the user.</param>

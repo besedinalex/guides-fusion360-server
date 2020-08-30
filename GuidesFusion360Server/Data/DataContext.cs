@@ -10,15 +10,15 @@ namespace GuidesFusion360Server.Data
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<UserModel> Users { get; set; }
 
-        public DbSet<Guide> Guides { get; set; }
+        public DbSet<GuideModel> Guides { get; set; }
 
-        public DbSet<PartGuide> PartGuides { get; set; }
+        public DbSet<PartGuideModel> PartGuides { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<UserModel>().HasIndex(u => u.Email).IsUnique();
         }
     }
 }

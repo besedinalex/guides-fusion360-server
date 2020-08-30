@@ -1,18 +1,17 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
 
-namespace GuidesFusion360Server.Dtos
+namespace GuidesFusion360Server.Models
 {
-    public class AddNewPartGuideDto
+    public class PartGuideModel
     {
+        public int Id { get; set; }
+
         [Required] public string Name { get; set; }
 
-        public string Content { get; set; }
+        [Required] public string Content { get; set; }
 
         [Required] public int SortKey { get; set; }
 
         [Required] public int GuideId { get; set; }
-
-        public IFormFile File { get; set; }
     }
 }
