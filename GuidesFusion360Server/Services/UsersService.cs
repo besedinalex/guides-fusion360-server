@@ -1,91 +1,77 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using GuidesFusion360Server.Data;
+using GuidesFusion360Server.Dtos;
 using GuidesFusion360Server.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace GuidesFusion360Server.Data
+namespace GuidesFusion360Server.Services
 {
     /// <inheritdoc />
-    public class AuthRepository : IAuthRepository
+    public class UsersService : IUsersService
     {
-        private readonly DataContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IUsersRepository _usersRepository;
 
-        public AuthRepository(DataContext context, IConfiguration configuration)
+        public UsersService(IConfiguration configuration, IUsersRepository usersRepository)
         {
-            _context = context;
             _configuration = configuration;
+            _usersRepository = usersRepository;
         }
 
         /// <inheritdoc />
-        public async Task<ServiceResponseModel<string>> Register(UserModel user, string password)
+        public async Task<ServiceResponseModel<string>> GetUserToken(string email, string password)
         {
             var serviceResponse = new ServiceResponseModel<string>();
 
-            if (await UserExists(user.Email))
+            var user = await _usersRepository.GetUser(email);
+            if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User with given email or password was not found.";
+                return serviceResponse;
+            }
+
+            serviceResponse.Data = CreateToken(user.Id, user.Email);
+            return serviceResponse;
+        }
+
+        /// <inheritdoc />
+        public async Task<ServiceResponseModel<string>> CreateNewUser(UserRegisterDto userData)
+        {
+            var serviceResponse = new ServiceResponseModel<string>();
+
+            if (await _usersRepository.UserExists(userData.Email))
             {
                 serviceResponse.Success = false;
                 serviceResponse.Message = "User with this email already exists.";
                 return serviceResponse;
             }
 
-            CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+            var user = new UserModel
+            {
+                Email = userData.Email,
+                FirstName = userData.FirstName,
+                LastName = userData.LastName,
+                Access = "unknown"
+            };
+
+            CreatePasswordHash(userData.Password, out var passwordHash, out var passwordSalt);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var userId = await _usersRepository.AddUser(user);
 
-            serviceResponse.Data = CreateToken(user);
-            serviceResponse.Message = "User is successfully created.";
+            serviceResponse.Data = CreateToken(userId, user.Email);
+            serviceResponse.Message = "User is created successfully .";
             return serviceResponse;
         }
-
-        /// <inheritdoc />
-        public async Task<ServiceResponseModel<string>> Login(string email, string password)
-        {
-            var serviceResponse = new ServiceResponseModel<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
-            if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "User with given email or password was not found.";
-            }
-            else
-            {
-                serviceResponse.Data = CreateToken(user);
-            }
-
-            return serviceResponse;
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> UserIsEditor(int userId)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-
-            return user != null && (user.Access == "editor" || user.Access == "admin");
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> UserIsAdmin(int userId)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-
-            return user != null && user.Access == "admin";
-        }
-
-        /// <summary>Checks if user exists.</summary>
-        /// <param name="email">Email of the user.</param>
-        /// <returns>Returns user existence status.</returns>
-        private async Task<bool> UserExists(string email) =>
-            await _context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
 
         /// <summary>Creates password hash.</summary>
         /// <param name="password">Raw password.</param>
@@ -107,26 +93,19 @@ namespace GuidesFusion360Server.Data
         {
             using var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != passwordHash[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return !computedHash.Where((x, i) => x != passwordHash[i]).Any();
         }
 
         /// <summary>Creates JWT token.</summary>
-        /// <param name="user">User data.</param>
+        /// <param name="userId">Id of the user.</param>
+        /// <param name="email">Email of the user.</param>
         /// <returns>Returns JWT token.</returns>
-        private string CreateToken(UserModel user)
+        private string CreateToken(int userId, string email)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Email)
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.Name, email)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8

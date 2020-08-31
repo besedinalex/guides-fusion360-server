@@ -61,5 +61,12 @@ namespace GuidesFusion360Server.Data
             var filePath = Path.Combine(_storage, guideId.ToString(), fileName);
             File.Delete(filePath);
         }
+
+        /// <inheritdoc />
+        public void DeleteFolder(int guideId)
+        {
+            var folderPath = Path.Combine(_storage, guideId.ToString());
+            Directory.Delete(folderPath, true);
+        }
     }
 }

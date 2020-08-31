@@ -11,10 +11,10 @@ namespace GuidesFusion360Server
     {
         public AutoMapperProfile()
         {
-            CreateMap<GuideModel, GetAllGuidesDto>();
-            CreateMap<PartGuideModel, GetAllPartGuidesDto>();
-            CreateMap<AddNewGuideDto, GuideModel>();
-            CreateMap<AddNewPartGuideDto, PartGuideModel>();
+            CreateMap<GuideModel, GetGuidesDto>();
+            CreateMap<PartGuideModel, GetPartGuidesDto>();
+            CreateMap<AddGuideDto, GuideModel>();
+            CreateMap<AddPartGuideDto, PartGuideModel>();
         }
     }
 }

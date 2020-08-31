@@ -30,9 +30,13 @@ namespace GuidesFusion360Server.Data
         /// <returns>Returns file as byte array.</returns>
         Task<byte[]> GetFile(int guideId, string fileName);
 
-        /// <summary>Deletes file/</summary>
+        /// <summary>Deletes file.</summary>
         /// <param name="guideId">Id of the guide.</param>
         /// <param name="fileName">Name of the file.</param>
         void DeleteFile(int guideId, string fileName);
+
+        /// <summary>Deletes folder and its content.</summary>
+        /// <param name="guideId">Id of the guide.</param>
+        void DeleteFolder(int guideId);
     }
 }

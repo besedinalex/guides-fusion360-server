@@ -7,59 +7,49 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GuidesFusion360Server.Services
 {
-    /// <summary>Service to work with guides data.</summary>
+    /// <summary>Service to process guides requests.</summary>
     public interface IGuidesService
     {
         /// <summary>Requests all public guides.</summary>
         /// <returns>Returns all public guides.</returns>
-        Task<ServiceResponseModel<List<GetAllGuidesDto>>> GetAllGuides();
+        Task<ServiceResponseModel<List<GetGuidesDto>>> GetAllPublicGuides();
 
         /// <summary>Requests all private guides.</summary>
         /// <param name="userId">Id of the user who makes the request.</param>
         /// <returns>Returns all available private guides.</returns>
-        Task<ServiceResponseModel<List<GetAllGuidesDto>>> GetAllHiddenGuides(int userId);
+        Task<ServiceResponseModel<List<GetGuidesDto>>> GetAllHiddenGuides(int userId);
 
-        /// <summary>Requests part guides of public guide.</summary>
+        /// <summary>Requests part guides of the guide.</summary>
         /// <param name="guideId">Id of the guide.</param>
+        /// <param name="userId">Id of the user.</param>
         /// <returns>Returns part guides and http code.</returns>
-        Task<Tuple<ServiceResponseModel<List<GetAllPartGuidesDto>>, int>> GetAllPublicPartGuides(int guideId);
+        Task<Tuple<ServiceResponseModel<List<GetPartGuidesDto>>, int>> GetPartGuides(int guideId, int userId);
 
-        /// <summary>Requests part guides of private guide.</summary>
-        /// <param name="guideId">Id of the guide.</param>
-        /// <param name="userId">Id of the user who makes the request.</param>
-        /// <returns>Returns part guides.</returns>
-        Task<ServiceResponseModel<List<GetAllPartGuidesDto>>> GetAllPrivatePartGuides(int guideId, int userId);
-
-        /// <summary>Requests file of public guide.</summary>
+        /// <summary>Requests file of the guide.</summary>
         /// <param name="guideId">Id of the guide.</param>
         /// <param name="filename">Name of the requested file.</param>
+        /// <param name="userId">Id of the user.</param>
         /// <returns>Returns file and http code.</returns>
-        Task<Tuple<ServiceResponseModel<FileContentResult>, int>> GetPublicGuideFile(int guideId, string filename);
-
-        /// <summary>Requests file of public guide.</summary>
-        /// <param name="guideId">Id of the guide.</param>
-        /// <param name="filename">Name of the requested file.</param>
-        /// <param name="userId">Id of the user who makes the request.</param>
-        /// <returns>Returns file.</returns>
-        Task<ServiceResponseModel<FileContentResult>> GetPrivateGuideFile(int guideId, string filename, int userId);
+        Task<Tuple<ServiceResponseModel<FileContentResult>, int>> GetGuideFile(int guideId, string filename,
+            int userId);
 
         /// <summary>Request to create guide.</summary>
         /// <param name="userId">Id of the user who makes the request.</param>
         /// <param name="newGuide">Guide data.</param>
         /// <returns>Returns id of the guide and http code.</returns>
-        Task<Tuple<ServiceResponseModel<int>, int>> CreateNewGuide(int userId, AddNewGuideDto newGuide);
+        Task<Tuple<ServiceResponseModel<int>, int>> CreateGuide(int userId, AddGuideDto newGuide);
 
         /// <summary>Request to create new part guide.</summary>
         /// <param name="userId">Id of the user who makes the request.</param>
         /// <param name="newPartGuide">Part guide data.</param>
         /// <returns>Returns id of the part guide and http code.</returns>
-        Task<Tuple<ServiceResponseModel<int>, int>> CreateNewPartGuide(int userId, AddNewPartGuideDto newPartGuide);
+        Task<Tuple<ServiceResponseModel<int>, int>> CreatePartGuide(int userId, AddPartGuideDto newPartGuide);
 
         /// <summary>Request to upload model.</summary>
         /// <param name="userId">Id of the user who makes the request.</param>
-        /// <param name="newModel">Model data.</param>
+        /// <param name="model">Model data.</param>
         /// <returns>Returns id of the guide and http code.</returns>
-        Task<Tuple<ServiceResponseModel<int>, int>> UploadModel(int userId, AddNewGuideModelDto newModel);
+        Task<Tuple<ServiceResponseModel<int>, int>> UploadModel(int userId, AddGuideModelDto model);
 
         /// <summary>Request to make guide hidden or not.</summary>
         /// <param name="userId">Id of the user who makes the request.</param>

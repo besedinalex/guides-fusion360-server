@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace GuidesFusion360Server.Dtos
 {
-    public class AddNewGuideDto
+    public class AddGuideDto
     {
         [Required] public string Name { get; set; }
 

@@ -24,9 +24,9 @@ namespace GuidesFusion360Server.Controllers
 
         [AllowAnonymous]
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllGuides()
+        public async Task<IActionResult> GetAllPublicGuides()
         {
-            return Ok(await _guidesService.GetAllGuides());
+            return Ok(await _guidesService.GetAllPublicGuides());
         }
 
         [HttpGet("all-hidden")]
@@ -34,6 +34,7 @@ namespace GuidesFusion360Server.Controllers
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             var serviceResponse = await _guidesService.GetAllHiddenGuides(userId);
+
             if (!serviceResponse.Success)
             {
                 return Unauthorized(serviceResponse);
@@ -43,73 +44,69 @@ namespace GuidesFusion360Server.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("parts-public/{guideId}")]
+        public async Task<IActionResult> GetPublicPartGuides([Required] int guideId)
+        {
+            var (serviceResponse, statusCode) = await _guidesService.GetPartGuides(guideId, -1);
+
+            return statusCode switch
+            {
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
         [HttpGet("parts/{guideId}")]
-        public async Task<IActionResult> GetAllPartGuides([Required] int guideId)
-        {
-            var (serviceResponse, statusCode) = await _guidesService.GetAllPublicPartGuides(guideId);
-            switch (statusCode)
-            {
-                case 404:
-                    return NotFound(serviceResponse);
-                case 401:
-                    try
-                    {
-                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!
-                            .Value);
-                        serviceResponse = await _guidesService.GetAllPrivatePartGuides(guideId, userId);
-                        if (!serviceResponse.Success)
-                        {
-                            return Unauthorized(serviceResponse);
-                        }
-
-                        return Ok(serviceResponse);
-                    }
-                    catch
-                    {
-                        return BadRequest(serviceResponse);
-                    }
-                default: // 200
-                    return Ok(serviceResponse);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("file/{guideId}")]
-        public async Task<IActionResult> GetGuideFile([Required] int guideId, [Required] string filename)
-        {
-            var (serviceResponse, statusCode) = await _guidesService.GetPublicGuideFile(guideId, filename);
-            switch (statusCode)
-            {
-                case 404:
-                    return NotFound(serviceResponse);
-                case 401:
-                    try
-                    {
-                        var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!
-                            .Value);
-                        serviceResponse = await _guidesService.GetPrivateGuideFile(guideId, filename, userId);
-                        if (!serviceResponse.Success)
-                        {
-                            return Unauthorized(serviceResponse);
-                        }
-
-                        return serviceResponse.Data;
-                    }
-                    catch
-                    {
-                        return BadRequest(serviceResponse);
-                    }
-                default: // 200
-                    return serviceResponse.Data;
-            }
-        }
-
-        [HttpPost("guide")]
-        public async Task<IActionResult> CreateNewGuide([FromForm] AddNewGuideDto newGuide)
+        public async Task<IActionResult> GetPrivatePartGuides([Required] int guideId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
-            var (serviceResponse, statusCode) = await _guidesService.CreateNewGuide(userId, newGuide);
+            var (serviceResponse, statusCode) = await _guidesService.GetPartGuides(guideId, userId);
+
+            return statusCode switch
+            {
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
+        [AllowAnonymous]
+        [HttpGet("file-public/{guideId}")]
+        public async Task<IActionResult> GetPublicGuideFile([Required] int guideId, [Required] string filename)
+        {
+            var (serviceResponse, statusCode) = await _guidesService.GetGuideFile(guideId, filename, -1);
+
+            return statusCode switch
+            {
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => serviceResponse.Data
+            };
+        }
+
+        [HttpGet("file/{guideId}")]
+        public async Task<IActionResult> GetPrivateGuideFile([Required] int guideId, [Required] string filename)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) = await _guidesService.GetGuideFile(guideId, filename, userId);
+
+            return statusCode switch
+            {
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => serviceResponse.Data
+            };
+        }
+
+        [HttpPost("guide")]
+        public async Task<IActionResult> CreateNewGuide([FromForm] AddGuideDto guide)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) = await _guidesService.CreateGuide(userId, guide);
 
             return statusCode switch
             {
@@ -121,11 +118,11 @@ namespace GuidesFusion360Server.Controllers
 
         [DisableRequestSizeLimit]
         [HttpPost("part-guide")]
-        public async Task<IActionResult> CreateNewPartGuide([FromForm] AddNewPartGuideDto newGuide)
+        public async Task<IActionResult> CreateNewPartGuide([FromForm] AddPartGuideDto guide)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
-            var (serviceResponse, statusCode) = await _guidesService.CreateNewPartGuide(userId, newGuide);
+            var (serviceResponse, statusCode) = await _guidesService.CreatePartGuide(userId, guide);
 
             return statusCode switch
             {
@@ -138,11 +135,11 @@ namespace GuidesFusion360Server.Controllers
 
         [DisableRequestSizeLimit]
         [HttpPost("model")]
-        public async Task<IActionResult> UploadModel([FromForm] AddNewGuideModelDto newModel)
+        public async Task<IActionResult> UploadModel([FromForm] AddGuideModelDto model)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
-            var (serviceResponse, statusCode) = await _guidesService.UploadModel(userId, newModel);
+            var (serviceResponse, statusCode) = await _guidesService.UploadModel(userId, model);
 
             return statusCode switch
             {

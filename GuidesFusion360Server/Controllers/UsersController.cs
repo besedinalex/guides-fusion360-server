@@ -1,31 +1,29 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using GuidesFusion360Server.Data;
 using GuidesFusion360Server.Dtos;
-using GuidesFusion360Server.Models;
+using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuidesFusion360Server.Controllers
 {
-    /// <summary>Controller for user requests.</summary>
     [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly IAuthRepository _authRepo;
+        private readonly IUsersService _usersService;
 
-        public UsersController(IAuthRepository authRepository)
+        public UsersController(IUsersService usersService)
         {
-            _authRepo = authRepository;
+            _usersService = usersService;
         }
 
         [AllowAnonymous]
         [HttpGet("token")]
         public async Task<IActionResult> GetUserToken([Required] string email, [Required] string password)
         {
-            var serviceResponse = await _authRepo.Login(email, password);
+            var serviceResponse = await _usersService.GetUserToken(email, password);
 
             if (!serviceResponse.Success)
             {
@@ -39,15 +37,7 @@ namespace GuidesFusion360Server.Controllers
         [HttpPost("new")]
         public async Task<IActionResult> CreateNewUser(UserRegisterDto newUser)
         {
-            var user = new UserModel()
-            {
-                Email = newUser.Email,
-                FirstName = newUser.FirstName,
-                LastName = newUser.LastName,
-                Access = "unknown"
-            };
-
-            var serviceResponse = await _authRepo.Register(user, newUser.Password);
+            var serviceResponse = await _usersService.CreateNewUser(newUser);
 
             if (!serviceResponse.Success)
             {
