@@ -35,5 +35,9 @@ namespace GuidesFusion360Server.Data
         /// <param name="userId">Id of the user.</param>
         /// <returns>Returns 'true' is user is admin.</returns>
         Task<bool> UserIsAdmin(int userId);
+
+        /// <summary>Updates user data.</summary>
+        /// <param name="user">User data.</param>
+        Task UpdateUser(UserModel user);
     }
 }

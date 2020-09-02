@@ -19,10 +19,17 @@ namespace GuidesFusion360Server.Services
         private readonly IConfiguration _configuration;
         private readonly IUsersRepository _usersRepository;
 
+        private static readonly List<Tuple<string, string, DateTime>> RestorePasswordCodes;
+
         public UsersService(IConfiguration configuration, IUsersRepository usersRepository)
         {
             _configuration = configuration;
             _usersRepository = usersRepository;
+        }
+
+        static UsersService()
+        {
+            RestorePasswordCodes = new List<Tuple<string, string, DateTime>>();
         }
 
         /// <inheritdoc />
@@ -69,8 +76,91 @@ namespace GuidesFusion360Server.Services
             var userId = await _usersRepository.AddUser(user);
 
             serviceResponse.Data = CreateToken(userId, user.Email);
-            serviceResponse.Message = "User is created successfully .";
+            serviceResponse.Message = "User is created successfully.";
             return serviceResponse;
+        }
+
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponseModel<string>, int>> GetPasswordRestoreCode(string email, int userId)
+        {
+            var serviceResponse = new ServiceResponseModel<string>();
+
+            var requesterIsAdmin = await _usersRepository.UserIsAdmin(userId);
+
+            if (!requesterIsAdmin)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User should be admin to make such a request.";
+                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 401);
+            }
+
+            if (!await _usersRepository.UserExists(email))
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User is not found.";
+                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 404);
+            }
+
+            // This isn't quite secure but this is a student project and those guides are backed up anyway.  
+            var random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var restoreCode = new string(Enumerable.Repeat(chars, 8).Select(s => s[random.Next(s.Length)]).ToArray());
+            var expireDate = DateTime.Now.AddMinutes(30.0);
+
+            var existingCode = RestorePasswordCodes.FirstOrDefault(x => x.Item2 == email);
+            if (existingCode != null)
+                RestorePasswordCodes.Remove(existingCode);
+
+            RestorePasswordCodes.Add(new Tuple<string, string, DateTime>(restoreCode, email, expireDate));
+
+            serviceResponse.Data = restoreCode;
+            serviceResponse.Message = "Send this restore code to the user.";
+            return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 200);
+        }
+
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponseModel<string>, int>> RestorePassword(string restoreCode, string password)
+        {
+            var serviceResponse = new ServiceResponseModel<string>();
+
+            var restoreData = RestorePasswordCodes.FirstOrDefault(x => x.Item1 == restoreCode);
+
+            if (restoreData == null)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Restore code is not found.";
+                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 404);
+            }
+
+            if (DateTime.Now > restoreData.Item3)
+            {
+                RestorePasswordCodes.Remove(restoreData);
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Restore code is expired.";
+                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 401);
+            }
+
+            var user = await _usersRepository.GetUser(restoreData.Item2);
+
+            if (VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "You cannot use the same password.";
+                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 400);
+            }
+
+            RestorePasswordCodes.Remove(restoreData);
+
+            CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            await _usersRepository.UpdateUser(user);
+
+            serviceResponse.Data = CreateToken(user.Id, user.Email);
+            serviceResponse.Message = "Password changed successfully.";
+            return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 200);
         }
 
         /// <summary>Creates password hash.</summary>

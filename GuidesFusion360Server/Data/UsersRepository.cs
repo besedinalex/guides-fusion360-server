@@ -48,5 +48,12 @@ namespace GuidesFusion360Server.Data
             var user = await GetUser(userId);
             return user != null && user.Access == "admin";
         }
+
+        /// <inheritdoc />
+        public Task UpdateUser(UserModel user)
+        {
+            _context.Users.Update(user);
+            return _context.SaveChangesAsync();
+        }
     }
 }
