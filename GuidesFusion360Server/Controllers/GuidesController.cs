@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GuidesFusion360Server.Dtos;
 using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuidesFusion360Server.Controllers
@@ -146,6 +147,7 @@ namespace GuidesFusion360Server.Controllers
                 400 => BadRequest(serviceResponse),
                 401 => Unauthorized(serviceResponse),
                 404 => NotFound(serviceResponse),
+                500 => StatusCode(StatusCodes.Status500InternalServerError, serviceResponse),
                 _ => Ok(serviceResponse)
             };
         }

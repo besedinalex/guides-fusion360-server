@@ -263,17 +263,28 @@ namespace GuidesFusion360Server.Services
             var extTo = new StringContent("glb");
             extTo.Headers.Add("Content-Disposition", "form-data; name=\"to\"");
             formData.Add(extTo, "to");
+            
+            try
+            {
+                // MPU Cloud Exchanger
+                using var client = _clientFactory.CreateClient("converter");
+                var response = await client.PostAsync("/model", formData);
+                response.EnsureSuccessStatusCode();
+                var data = JObject.Parse(await response.Content.ReadAsStringAsync());
+                var glbModel = Convert.FromBase64String(data["output"].ToString());
 
-            // MPU Cloud Exchanger
-            using var client = _clientFactory.CreateClient("converter");
-            var response = await client.PostAsync("/model", formData);
-            var data = JObject.Parse(await response.Content.ReadAsStringAsync());
-            var glbModel = Convert.FromBase64String(data["output"].ToString());
+                await _fileManager.SaveFile(model.GuideId, "model.glb", glbModel);
 
-            await _fileManager.SaveFile(model.GuideId, "model.glb", glbModel);
-
-            serviceResponse.Data = model.GuideId;
-            return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 200);
+                serviceResponse.Data = model.GuideId;
+                serviceResponse.Message = "Model was converted to and saved as glb successfully.";
+                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 200);
+            }
+            catch
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Unable to convert the model.";
+                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 500);
+            }
         }
 
         /// <inheritdoc />
