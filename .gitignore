@@ -1,7 +1,6 @@
 .DS_Store
 .idea/
 *.sqlite3
-Migrations/
 wwwroot/
 Fusion360Guide/
 
