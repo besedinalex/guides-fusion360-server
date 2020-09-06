@@ -576,7 +576,7 @@ namespace GuidesFusion360Server.Services
             }
 
             var (isEditable, accessResponse, statusCode, guide) =
-                await GuideIsEditable<T>(userId, partGuideId, requiresAdminAccess);
+                await GuideIsEditable<T>(userId, partGuide.GuideId, requiresAdminAccess);
 
             return new Tuple<bool, ServiceResponseModel<T>, int, PartGuideModel>(isEditable, accessResponse, statusCode,
                 partGuide);
