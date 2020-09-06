@@ -22,6 +22,21 @@ namespace GuidesFusion360Server.Controllers
             _usersService = usersService;
         }
 
+        [HttpGet("access-self")]
+        public async Task<IActionResult> GetUserAccess()
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var serviceResponse = await _usersService.GetUserAccess(userId);
+
+            if (!serviceResponse.Success)
+            {
+                return NotFound(serviceResponse);
+            }
+
+            return Ok(serviceResponse);
+        }
+
         [AllowAnonymous]
         [HttpGet("token")]
         public async Task<IActionResult> GetUserToken([Required] string email, [Required] string password)

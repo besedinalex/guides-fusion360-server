@@ -33,6 +33,23 @@ namespace GuidesFusion360Server.Services
         }
 
         /// <inheritdoc />
+        public async Task<ServiceResponseModel<string>> GetUserAccess(int userId)
+        {
+            var serviceResponse = new ServiceResponseModel<string>();
+
+            var user = await _usersRepository.GetUser(userId);
+            if (user == null)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User with given id was not found.";
+                return serviceResponse;
+            }
+
+            serviceResponse.Data = user.Access;
+            return serviceResponse;
+        }
+
+        /// <inheritdoc />
         public async Task<ServiceResponseModel<string>> GetUserToken(string email, string password)
         {
             var serviceResponse = new ServiceResponseModel<string>();
