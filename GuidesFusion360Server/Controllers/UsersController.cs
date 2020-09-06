@@ -65,6 +65,36 @@ namespace GuidesFusion360Server.Controllers
             return Ok(serviceResponse);
         }
 
+        [AllowAnonymous]
+        [HttpPut("restore-password")]
+        public async Task<IActionResult> RestorePassword([Required] string restoreCode, [Required] string password)
+        {
+            var (serviceResponse, statusCode) = await _usersService.RestorePassword(restoreCode, password);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var serviceResponse = await _usersService.GetUsers(userId);
+
+            if (!serviceResponse.Success)
+            {
+                return Unauthorized(serviceResponse);
+            }
+
+            return Ok(serviceResponse);
+        }
+
         [HttpGet("password-restore-code")]
         public async Task<IActionResult> GetRestorePasswordCode([Required] string email)
         {
@@ -80,11 +110,13 @@ namespace GuidesFusion360Server.Controllers
             };
         }
 
-        [AllowAnonymous]
-        [HttpPut("restore-password")]
-        public async Task<IActionResult> RestorePassword([Required] string restoreCode, [Required] string password)
+        [HttpPut("access")]
+        public async Task<IActionResult> UpdateUserAccess(UpdateUserAccessDto userData)
         {
-            var (serviceResponse, statusCode) = await _usersService.RestorePassword(restoreCode, password);
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) =
+                await _usersService.UpdateUserAccess(userData.Email, userData.Access, userId);
 
             return statusCode switch
             {

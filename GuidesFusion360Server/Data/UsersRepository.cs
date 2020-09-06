@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GuidesFusion360Server.Models;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,9 @@ namespace GuidesFusion360Server.Data
         /// <inheritdoc />
         public Task<UserModel> GetUser(string email) =>
             _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+
+        public Task<List<UserModel>> GetUsers() =>
+            _context.Users.ToListAsync();
 
         /// <inheritdoc />
         public Task<bool> UserExists(string email) =>

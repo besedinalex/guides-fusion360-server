@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GuidesFusion360Server.Models;
 
@@ -20,6 +21,10 @@ namespace GuidesFusion360Server.Data
         /// <param name="email">Email of the user.</param>
         /// <returns>Returns user data.</returns>
         Task<UserModel> GetUser(string email);
+
+        /// <summary>Gets all users data.</summary>
+        /// <returns>Returns list of all users.</returns>
+        Task<List<UserModel>> GetUsers();
 
         /// <summary>Checks if user with given email exists.</summary>
         /// <param name="email">Email of the user.</param>
