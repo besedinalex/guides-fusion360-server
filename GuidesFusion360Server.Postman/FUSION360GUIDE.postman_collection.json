@@ -1,0 +1,830 @@
+{
+	"info": {
+		"_postman_id": "02b52578-a4cf-4546-82fd-5815defe8c56",
+		"name": "FUSION360GUIDE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User requests",
+			"item": [
+				{
+					"name": "Get user self access",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/access-self",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"access-self"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f25ab460-88e7-4aa3-afdd-411b8cef724e",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"token\", jsonData.data);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/token?Email=besedinalexey@gmail.com&Password=123qwerty",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"token"
+							],
+							"query": [
+								{
+									"key": "Email",
+									"value": "besedinalexey@gmail.com"
+								},
+								{
+									"key": "Password",
+									"value": "123qwerty"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "90087426-7f56-40f5-819b-6fb65851fb02",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"token\", jsonData.data);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Email\": \"besedinalexey@gmail.com\",\n    \"FirstName\": \"Alexey\",\n    \"LastName\": \"Besedin\",\n    \"Password\": \"123qwerty\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/new",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"new"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6f506f91-6c05-4822-94c0-cebbe36c868d",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"if (jsonData.success === true) {",
+									"    postman.setEnvironmentVariable(\"token\", jsonData.data);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/restore-password?RestoreCode={{restore-password-code}}&Password=123qwerty",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"restore-password"
+							],
+							"query": [
+								{
+									"key": "RestoreCode",
+									"value": "{{restore-password-code}}"
+								},
+								{
+									"key": "Password",
+									"value": "123qwerty"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/all",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get password restore code",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c4b19be-546e-47e5-bd66-25d11bb4f751",
+								"exec": [
+									"if (responseBody !== '') {",
+									"    var jsonData = JSON.parse(responseBody);",
+									"    postman.setEnvironmentVariable(\"restore-password-code\", jsonData.data);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/password-restore-code?Email=besedinalexey@gmail.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"password-restore-code"
+							],
+							"query": [
+								{
+									"key": "Email",
+									"value": "besedinalexey@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user access",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Email\": \"a@gmail.com\",\n    \"Access\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/access",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"access"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/user?Email=besedinalexey@gmail.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"user"
+							],
+							"query": [
+								{
+									"key": "Email",
+									"value": "besedinalexey@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Guides requests",
+			"item": [
+				{
+					"name": "Get all public guides",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/all",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all hidden guides",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/all-hidden",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"all-hidden"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get public part guides",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/parts-public/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"parts-public",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get private part guides",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/parts/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"parts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get public guide file",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/file-public/1?filename=preview.png",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"file-public",
+								"1"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "preview.png"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get private guide file",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c6c87afd-f412-44da-ba71-f3197ea856ad",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/file/1?filename=preview.png",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"file",
+								"1"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "preview.png"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new guide",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Name",
+									"value": "Ченг",
+									"type": "text"
+								},
+								{
+									"key": "Description",
+									"value": "Учитель",
+									"type": "text"
+								},
+								{
+									"key": "Image",
+									"type": "file",
+									"src": "/Users/penguin/OneDrive/Temp/Example/Teacher Cheng.png"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/guides/guide",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"guide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new part guide",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Name",
+									"value": "Документ",
+									"type": "text"
+								},
+								{
+									"key": "GuideId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "File",
+									"type": "file",
+									"src": "/Users/penguin/OneDrive/Temp/Example/Рама.pdf"
+								},
+								{
+									"key": "SortKey",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "Content",
+									"value": "https://youtube.com/embed/CQXrY3CFG1s",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/guides/part-guide",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"part-guide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update guide visibility",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/hidden/1?hidden=false",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"hidden",
+								"1"
+							],
+							"query": [
+								{
+									"key": "hidden",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update part guide",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Name",
+									"value": "Video",
+									"type": "text"
+								},
+								{
+									"key": "Content",
+									"value": "https://youtube.com/embed/CQXrY3CFG1s",
+									"type": "text"
+								},
+								{
+									"key": "File",
+									"type": "file",
+									"src": "/Users/penguin/OneDrive/Temp/Example/Рама.pdf",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/guides/part-guide/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"part-guide",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Switch part guides",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/switch?PartGuideId1=1&PartGuideId2=2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"switch"
+							],
+							"query": [
+								{
+									"key": "PartGuideId1",
+									"value": "1"
+								},
+								{
+									"key": "PartGuideId2",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove guide",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/guide/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"guide",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove part guide",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/part-guide/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"part-guide",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Models requests",
+			"item": [
+				{
+					"name": "Upload new model",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "GuideId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "File",
+									"type": "file",
+									"src": "/Users/penguin/OneDrive/Temp/Example/Редуктор.stp"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/guides/model",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"model"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
