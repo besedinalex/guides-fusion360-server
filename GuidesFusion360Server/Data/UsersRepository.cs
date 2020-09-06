@@ -59,5 +59,12 @@ namespace GuidesFusion360Server.Data
             _context.Users.Update(user);
             return _context.SaveChangesAsync();
         }
+
+        /// <inheritdoc />
+        public Task RemoveUser(UserModel user)
+        {
+            _context.Users.Remove(user);
+            return _context.SaveChangesAsync();
+        }
     }
 }

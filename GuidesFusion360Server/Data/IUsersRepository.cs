@@ -44,5 +44,9 @@ namespace GuidesFusion360Server.Data
         /// <summary>Updates user data.</summary>
         /// <param name="user">User data.</param>
         Task UpdateUser(UserModel user);
+
+        /// <summary>Removes user.</summary>
+        /// <param name="user">User data.</param>
+        Task RemoveUser(UserModel user);
     }
 }

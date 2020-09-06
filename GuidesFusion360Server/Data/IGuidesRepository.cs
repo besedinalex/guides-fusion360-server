@@ -12,6 +12,10 @@ namespace GuidesFusion360Server.Data
         /// <returns>Returns guide.</returns>
         Task<GuideModel> GetGuide(int guideId);
 
+        /// <summary>Gets all guides.</summary>
+        /// <returns>Returns all guides.</returns>
+        Task<List<GuideModel>> GetAllGuides();
+
         /// <summary>Gets all public guides.</summary>
         /// <returns>Returns all public guides.</returns>
         Task<List<GuideModel>> GetAllPublicGuides();
@@ -43,6 +47,10 @@ namespace GuidesFusion360Server.Data
         /// <summary>Updates guide.</summary>
         /// <param name="guide">Guide data.</param>
         Task UpdateGuide(GuideModel guide);
+
+        /// <summary>Updates guides.</summary>
+        /// <param name="guides">Guides data.</param>
+        Task UpdateGuides(List<GuideModel> guides);
 
         /// <summary>Updates part guide.</summary>
         /// <param name="partGuide">Part guide data.</param>

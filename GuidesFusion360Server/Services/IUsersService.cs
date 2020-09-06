@@ -48,5 +48,11 @@ namespace GuidesFusion360Server.Services
         /// <param name="userId">Id of the requester.</param>
         /// <returns>Returns new access and http code.</returns>
         Task<Tuple<ServiceResponseModel<string>, int>> UpdateUserAccess(string email, string access, int userId);
+
+        /// <summary>Requests to delete user.</summary>
+        /// <param name="email">Email of the user who will be deleted.</param>
+        /// <param name="userId">Id of the requester.</param>
+        /// <returns>Returns number of guides that user had and http code.</returns>
+        Task<Tuple<ServiceResponseModel<int>, int>> DeleteUser(string email, int userId);
     }
 }

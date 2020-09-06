@@ -20,14 +20,17 @@ namespace GuidesFusion360Server.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IUsersRepository _usersRepository;
+        private readonly IGuidesRepository _guidesRepository;
 
         private static readonly List<Tuple<string, string, DateTime>> RestorePasswordCodes;
 
-        public UsersService(IMapper mapper, IConfiguration configuration, IUsersRepository usersRepository)
+        public UsersService(IMapper mapper, IConfiguration configuration, IUsersRepository usersRepository,
+            IGuidesRepository guidesRepository)
         {
             _mapper = mapper;
             _configuration = configuration;
             _usersRepository = usersRepository;
+            _guidesRepository = guidesRepository;
         }
 
         static UsersService()
@@ -245,6 +248,53 @@ namespace GuidesFusion360Server.Services
             serviceResponse.Data = access;
             serviceResponse.Message = "New access level is set.";
             return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 200);
+        }
+
+        /// <inheritdoc />
+        public async Task<Tuple<ServiceResponseModel<int>, int>> DeleteUser(string email, int userId)
+        {
+            var serviceResponse = new ServiceResponseModel<int>();
+
+            var (isAdmin, accessResponse, statusCode) = await RequesterIsAdmin<int>(userId);
+            if (!isAdmin)
+            {
+                return new Tuple<ServiceResponseModel<int>, int>(accessResponse, statusCode);
+            }
+
+            var user = await _usersRepository.GetUser(email);
+
+            if (user == null)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User is not found.";
+                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 404);
+            }
+
+            if (user.Id == userId)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "You cannot delete yourself.";
+                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 400);
+            }
+
+            if (user.Access == "admin")
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "You cannot delete another admin.";
+                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 400);
+            }
+
+            var userGuides = await _guidesRepository.GetAllGuides();
+
+            foreach (var guide in userGuides)
+                guide.OwnerId = userId;
+
+            await _guidesRepository.UpdateGuides(userGuides);
+            await _usersRepository.RemoveUser(user);
+
+            serviceResponse.Data = userGuides.Count;
+            serviceResponse.Message = "User is removed";
+            return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 200);
         }
 
         /// <summary>Checks if requests is admin.</summary>

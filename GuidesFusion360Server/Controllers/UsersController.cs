@@ -126,5 +126,21 @@ namespace GuidesFusion360Server.Controllers
                 _ => Ok(serviceResponse)
             };
         }
+
+        [HttpDelete("user")]
+        public async Task<IActionResult> DeleteUser([Required] string email)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) = await _usersService.DeleteUser(email, userId);
+
+            return statusCode switch
+            {
+                400 => BadRequest(serviceResponse),
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
     }
 }
