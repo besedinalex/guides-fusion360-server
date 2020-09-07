@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GuidesFusion360Server.Models
@@ -10,8 +11,12 @@ namespace GuidesFusion360Server.Models
 
         [Required] public string Description { get; set; }
 
-        [Required] public int OwnerId { get; set; }
+        public int OwnerId { get; set; }
+
+        public UserModel Owner { get; set; }
 
         [Required] public string Hidden { get; set; }
+
+        public ICollection<PartGuideModel> PartGuides { get; set; }
     }
 }

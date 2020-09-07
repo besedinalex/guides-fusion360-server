@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GuidesFusion360Server.Models
@@ -17,5 +18,7 @@ namespace GuidesFusion360Server.Models
         [Required] public byte[] PasswordHash { get; set; }
 
         [Required] public byte[] PasswordSalt { get; set; }
+
+        public ICollection<GuideModel> Guides { get; set; }
     }
 }

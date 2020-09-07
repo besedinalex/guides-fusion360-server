@@ -18,7 +18,17 @@ namespace GuidesFusion360Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserModel>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<UserModel>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<GuideModel>()
+                .HasOne(x => x.Owner)
+                .WithMany(x => x.Guides);
+
+            modelBuilder.Entity<PartGuideModel>()
+                .HasOne(x => x.Guide)
+                .WithMany(x => x.PartGuides);
         }
     }
 }

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GuidesFusion360Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200830142927_Init")]
+    [Migration("20200907174643_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace GuidesFusion360Server.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.7");
 
-            modelBuilder.Entity("GuidesFusion360Server.Models.Guide", b =>
+            modelBuilder.Entity("GuidesFusion360Server.Models.GuideModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,10 +41,12 @@ namespace GuidesFusion360Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OwnerId");
+
                     b.ToTable("Guides");
                 });
 
-            modelBuilder.Entity("GuidesFusion360Server.Models.PartGuide", b =>
+            modelBuilder.Entity("GuidesFusion360Server.Models.PartGuideModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,10 +68,12 @@ namespace GuidesFusion360Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GuideId");
+
                     b.ToTable("PartGuides");
                 });
 
-            modelBuilder.Entity("GuidesFusion360Server.Models.User", b =>
+            modelBuilder.Entity("GuidesFusion360Server.Models.UserModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,6 +109,24 @@ namespace GuidesFusion360Server.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("GuidesFusion360Server.Models.GuideModel", b =>
+                {
+                    b.HasOne("GuidesFusion360Server.Models.UserModel", "Owner")
+                        .WithMany("Guides")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GuidesFusion360Server.Models.PartGuideModel", b =>
+                {
+                    b.HasOne("GuidesFusion360Server.Models.GuideModel", "Guide")
+                        .WithMany("PartGuides")
+                        .HasForeignKey("GuideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

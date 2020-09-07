@@ -12,6 +12,8 @@ namespace GuidesFusion360Server.Models
 
         [Required] public int SortKey { get; set; }
 
-        [Required] public int GuideId { get; set; }
+        public int GuideId { get; set; }
+        
+        public GuideModel Guide { get; set; }
     }
 }
