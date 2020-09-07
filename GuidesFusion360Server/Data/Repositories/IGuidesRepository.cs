@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GuidesFusion360Server.Models;
 
-namespace GuidesFusion360Server.Data
+namespace GuidesFusion360Server.Data.Repositories
 {
     /// <summary>Repository to work with guides db data.</summary>
     public interface IGuidesRepository

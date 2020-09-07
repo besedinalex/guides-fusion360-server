@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using AutoMapper;
 using GuidesFusion360Server.Data;
+using GuidesFusion360Server.Data.Repositories;
 using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -45,6 +46,8 @@ namespace GuidesFusion360Server
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IGuidesRepository, GuidesRepository>();
             services.AddScoped<IGuidesService, GuidesService>();
+            services.AddScoped<IModelAnnotationsRepository, ModelAnnotationsRepository>();
+            services.AddScoped<IModelAnnotationsService, ModelAnnotationsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

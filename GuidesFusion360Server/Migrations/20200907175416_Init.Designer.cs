@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GuidesFusion360Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200907174643_Init")]
+    [Migration("20200907175416_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,38 @@ namespace GuidesFusion360Server.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Guides");
+                });
+
+            modelBuilder.Entity("GuidesFusion360Server.Models.ModelAnnotationModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GuideId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("X")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Y")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Z")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuideId");
+
+                    b.ToTable("ModelAnnotations");
                 });
 
             modelBuilder.Entity("GuidesFusion360Server.Models.PartGuideModel", b =>
@@ -116,6 +148,15 @@ namespace GuidesFusion360Server.Migrations
                     b.HasOne("GuidesFusion360Server.Models.UserModel", "Owner")
                         .WithMany("Guides")
                         .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GuidesFusion360Server.Models.ModelAnnotationModel", b =>
+                {
+                    b.HasOne("GuidesFusion360Server.Models.GuideModel", "Guide")
+                        .WithMany("ModelAnnotations")
+                        .HasForeignKey("GuideId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

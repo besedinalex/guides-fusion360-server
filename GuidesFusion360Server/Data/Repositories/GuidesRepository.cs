@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using GuidesFusion360Server.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GuidesFusion360Server.Data
+namespace GuidesFusion360Server.Data.Repositories
 {
     /// <inheritdoc />
     public class GuidesRepository : IGuidesRepository

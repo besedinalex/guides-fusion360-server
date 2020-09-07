@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using GuidesFusion360Server.Data;
+using GuidesFusion360Server.Data.Repositories;
 using GuidesFusion360Server.Dtos;
 using GuidesFusion360Server.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -19,15 +20,18 @@ namespace GuidesFusion360Server.Services
         private readonly IFileManager _fileManager;
         private readonly IGuidesRepository _guidesRepository;
         private readonly IUsersRepository _usersRepository;
+        private readonly IModelAnnotationsRepository _modelAnnotationsRepository;
         private readonly IHttpClientFactory _clientFactory;
 
         public GuidesService(IMapper mapper, IFileManager fileManager, IGuidesRepository guidesRepository,
-            IUsersRepository usersRepository, IHttpClientFactory clientFactory)
+            IUsersRepository usersRepository, IModelAnnotationsRepository modelAnnotationsRepository,
+            IHttpClientFactory clientFactory)
         {
             _mapper = mapper;
             _fileManager = fileManager;
             _guidesRepository = guidesRepository;
             _usersRepository = usersRepository;
+            _modelAnnotationsRepository = modelAnnotationsRepository;
             _clientFactory = clientFactory;
         }
 
@@ -263,7 +267,7 @@ namespace GuidesFusion360Server.Services
             var extTo = new StringContent("glb");
             extTo.Headers.Add("Content-Disposition", "form-data; name=\"to\"");
             formData.Add(extTo, "to");
-            
+
             try
             {
                 // MPU Cloud Exchanger
@@ -458,7 +462,10 @@ namespace GuidesFusion360Server.Services
                 return new Tuple<ServiceResponseModel<int>, int>(accessResponse, statusCode);
             }
 
+            var guideModelAnnotations = await _modelAnnotationsRepository.GetAnnotations(guideId);
+
             _fileManager.DeleteFolder(guideId);
+            await _modelAnnotationsRepository.DeleteAnnotations(guideModelAnnotations);
             await _guidesRepository.RemoveGuide(guide);
 
             serviceResponse.Message = "Guide is deleted successfully.";

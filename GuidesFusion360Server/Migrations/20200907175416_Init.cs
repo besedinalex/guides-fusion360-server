@@ -48,6 +48,30 @@ namespace GuidesFusion360Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ModelAnnotations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    GuideId = table.Column<int>(nullable: false),
+                    X = table.Column<double>(nullable: false),
+                    Y = table.Column<double>(nullable: false),
+                    Z = table.Column<double>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Text = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModelAnnotations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModelAnnotations_Guides_GuideId",
+                        column: x => x.GuideId,
+                        principalTable: "Guides",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PartGuides",
                 columns: table => new
                 {
@@ -75,6 +99,11 @@ namespace GuidesFusion360Server.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ModelAnnotations_GuideId",
+                table: "ModelAnnotations",
+                column: "GuideId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PartGuides_GuideId",
                 table: "PartGuides",
                 column: "GuideId");
@@ -88,6 +117,9 @@ namespace GuidesFusion360Server.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ModelAnnotations");
+
             migrationBuilder.DropTable(
                 name: "PartGuides");
 

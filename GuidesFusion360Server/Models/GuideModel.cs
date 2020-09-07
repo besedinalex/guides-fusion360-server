@@ -18,5 +18,7 @@ namespace GuidesFusion360Server.Models
         [Required] public string Hidden { get; set; }
 
         public ICollection<PartGuideModel> PartGuides { get; set; }
+
+        public ICollection<ModelAnnotationModel> ModelAnnotations { get; set; }
     }
 }

@@ -16,6 +16,8 @@ namespace GuidesFusion360Server.Data
 
         public DbSet<PartGuideModel> PartGuides { get; set; }
 
+        public DbSet<ModelAnnotationModel> ModelAnnotations { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserModel>()
@@ -29,6 +31,10 @@ namespace GuidesFusion360Server.Data
             modelBuilder.Entity<PartGuideModel>()
                 .HasOne(x => x.Guide)
                 .WithMany(x => x.PartGuides);
+
+            modelBuilder.Entity<ModelAnnotationModel>()
+                .HasOne(x => x.Guide)
+                .WithMany(x => x.ModelAnnotations);
         }
     }
 }

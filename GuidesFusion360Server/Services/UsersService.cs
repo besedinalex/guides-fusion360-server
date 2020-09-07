@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using GuidesFusion360Server.Data;
+using GuidesFusion360Server.Data.Repositories;
 using GuidesFusion360Server.Dtos;
 using GuidesFusion360Server.Models;
 using Microsoft.Extensions.Configuration;
