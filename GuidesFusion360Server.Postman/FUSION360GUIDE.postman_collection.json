@@ -821,6 +821,120 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get public model annotations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/model-annotations/all-public/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"model-annotations",
+								"all-public",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get private model annotations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/model-annotations/all/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"model-annotations",
+								"all",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add model annotation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"guideId\": 1,\n    \"x\": 10.15,\n    \"y\": -9.6,\n    \"z\": -0.6,\n    \"name\": \"Johnny\",\n    \"text\": \"Hah, the sound of it.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/model-annotations/new",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"model-annotations",
+								"new"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete annotation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/model-annotations/annotation/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"model-annotations",
+								"annotation",
+								"1"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
