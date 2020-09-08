@@ -36,6 +36,12 @@ namespace GuidesFusion360Server.Services
         /// <returns>Returns all users data.</returns>
         Task<ServiceResponseModel<List<GetUsersDto>>> GetUsers(int userId);
 
+        /// <summary>Requests guides that user own.</summary>
+        /// <param name="userId">Id of the user.</param>
+        /// <param name="requesterId">Id of the requester.</param>
+        /// <returns>Returns all users guides and http code.</returns>
+        Task<Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>> GetUserGuides(int userId, int requesterId);
+
         /// <summary>Requests password restore code.</summary>
         /// <param name="email">Email of user who need to restore the password.</param>
         /// <param name="userId">Id of the user who requests the code.</param>

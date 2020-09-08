@@ -166,6 +166,33 @@ namespace GuidesFusion360Server.Services
         }
 
         /// <inheritdoc />
+        public async Task<Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>> GetUserGuides(int userId,
+            int requesterId)
+        {
+            var (isAdmin, accessResponse, statusCode) = await RequesterIsAdmin<List<GetUserGuidesDto>>(requesterId);
+            if (!isAdmin)
+            {
+                return new Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>(accessResponse, statusCode);
+            }
+
+            var serviceResponse = new ServiceResponseModel<List<GetUserGuidesDto>>();
+
+            var user = await _usersRepository.GetUser(userId);
+            if (user == null)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User is not found.";
+                return new Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>(serviceResponse, 404);
+            }
+
+            var allGuides = await _guidesRepository.GetAllGuides();
+            var userGuides = allGuides.Where(x => x.OwnerId == userId).ToList();
+
+            serviceResponse.Data = userGuides.Select(x => _mapper.Map<GetUserGuidesDto>(x)).ToList();
+            return new Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>(serviceResponse, 200);
+        }
+
+        /// <inheritdoc />
         public async Task<Tuple<ServiceResponseModel<string>, int>> GetPasswordRestoreCode(string email, int userId)
         {
             var serviceResponse = new ServiceResponseModel<string>();

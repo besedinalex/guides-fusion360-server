@@ -189,6 +189,35 @@
 					"response": []
 				},
 				{
+					"name": "Get user guides",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/guides/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"guides",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get password restore code",
 					"event": [
 						{
@@ -475,6 +504,35 @@
 									"key": "filename",
 									"value": "preview.png"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get guide owner",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guides/owner/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guides",
+								"owner",
+								"1"
 							]
 						}
 					},

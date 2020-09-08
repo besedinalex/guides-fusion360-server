@@ -95,6 +95,21 @@ namespace GuidesFusion360Server.Controllers
             return Ok(serviceResponse);
         }
 
+        [HttpGet("guides/{userId}")]
+        public async Task<IActionResult> GetUserGuides([Required] int userId)
+        {
+            var requesterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+
+            var (serviceResponse, statusCode) = await _usersService.GetUserGuides(userId, requesterId);
+
+            return statusCode switch
+            {
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
         [HttpGet("password-restore-code")]
         public async Task<IActionResult> GetRestorePasswordCode([Required] string email)
         {
