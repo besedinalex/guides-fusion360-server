@@ -13,6 +13,7 @@ namespace GuidesFusion360Server
         {
             CreateMap<GuideModel, GetGuidesDto>();
             CreateMap<PartGuideModel, GetPartGuidesDto>();
+            CreateMap<UserModel, GetGuideOwnerDto>();
             CreateMap<AddGuideDto, GuideModel>();
             CreateMap<AddPartGuideDto, PartGuideModel>();
             CreateMap<UserModel, GetUsersDto>();

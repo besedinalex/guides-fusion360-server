@@ -102,6 +102,20 @@ namespace GuidesFusion360Server.Controllers
             };
         }
 
+        [HttpGet("owner/{guideId}")]
+        public async Task<IActionResult> GetGuideOwner([Required] int guideId)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var (serviceResponse, statusCode) = await _guidesService.GetGuideOwner(guideId, userId);
+
+            return statusCode switch
+            {
+                401 => Unauthorized(serviceResponse),
+                404 => NotFound(serviceResponse),
+                _ => Ok(serviceResponse)
+            };
+        }
+
         [HttpPost("guide")]
         public async Task<IActionResult> CreateNewGuide([FromForm] AddGuideDto guide)
         {

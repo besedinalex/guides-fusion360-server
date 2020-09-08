@@ -143,6 +143,33 @@ namespace GuidesFusion360Server.Services
         }
 
         /// <inheritdoc />
+        public async Task<Tuple<ServiceResponseModel<GetGuideOwnerDto>, int>> GetGuideOwner(int guideId, int userId)
+        {
+            var serviceResponse = new ServiceResponseModel<GetGuideOwnerDto>();
+
+            var hasAccess = await _usersRepository.UserIsEditor(userId);
+            if (!hasAccess)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "User access should be editor or admin.";
+                return new Tuple<ServiceResponseModel<GetGuideOwnerDto>, int>(serviceResponse, 401);
+            }
+
+            var guide = await _guidesRepository.GetGuide(guideId);
+            if (guide == null)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Guide is not found.";
+                return new Tuple<ServiceResponseModel<GetGuideOwnerDto>, int>(serviceResponse, 404);
+            }
+            
+            var owner = await _usersRepository.GetUser(guide.OwnerId);
+
+            serviceResponse.Data = _mapper.Map<GetGuideOwnerDto>(owner);
+            return new Tuple<ServiceResponseModel<GetGuideOwnerDto>, int>(serviceResponse, 200);
+        }
+
+        /// <inheritdoc />
         public async Task<Tuple<ServiceResponseModel<int>, int>> CreateGuide(int userId, AddGuideDto newGuide)
         {
             var serviceResponse = new ServiceResponseModel<int>();

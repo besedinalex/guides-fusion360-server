@@ -33,6 +33,12 @@ namespace GuidesFusion360Server.Services
         Task<Tuple<ServiceResponseModel<FileContentResult>, int>> GetGuideFile(int guideId, string filename,
             int userId);
 
+        /// <summary>Requests guide owner data.</summary>
+        /// <param name="guideId">Id of the guide.</param>
+        /// <param name="userId">Id of the requester.</param>
+        /// <returns>Returns owner data and http code.</returns>
+        Task<Tuple<ServiceResponseModel<GetGuideOwnerDto>, int>> GetGuideOwner(int guideId, int userId);
+
         /// <summary>Request to create guide.</summary>
         /// <param name="userId">Id of the user who makes the request.</param>
         /// <param name="newGuide">Guide data.</param>
