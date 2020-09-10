@@ -16,15 +16,15 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public Task<ModelAnnotationModel> GetAnnotation(int annotationId) =>
+        public Task<ModelAnnotation> GetAnnotation(int annotationId) =>
             _context.ModelAnnotations.FirstOrDefaultAsync(x => x.Id == annotationId);
 
         /// <inheritdoc />
-        public Task<List<ModelAnnotationModel>> GetAnnotations(int guideId) =>
+        public Task<List<ModelAnnotation>> GetAnnotations(int guideId) =>
             _context.ModelAnnotations.Where(x => x.GuideId == guideId).ToListAsync();
 
         /// <inheritdoc />
-        public async Task<int> AddAnnotation(ModelAnnotationModel annotation)
+        public async Task<int> AddAnnotation(ModelAnnotation annotation)
         {
             await _context.ModelAnnotations.AddAsync(annotation);
             await _context.SaveChangesAsync();
@@ -33,14 +33,14 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public Task DeleteAnnotation(ModelAnnotationModel annotation)
+        public Task DeleteAnnotation(ModelAnnotation annotation)
         {
             _context.ModelAnnotations.Remove(annotation);
             return _context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task DeleteAnnotations(List<ModelAnnotationModel> annotations)
+        public Task DeleteAnnotations(List<ModelAnnotation> annotations)
         {
             _context.ModelAnnotations.RemoveRange(annotations);
             return _context.SaveChangesAsync();

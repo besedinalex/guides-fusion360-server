@@ -1,6 +1,6 @@
-namespace GuidesFusion360Server.Dtos
+namespace GuidesFusion360Server.Dtos.ModelAnnotations
 {
-    public class GetModelAnnotationsDto
+    public class GetModelAnnotationDto
     {
         public int Id { get; set; }
 

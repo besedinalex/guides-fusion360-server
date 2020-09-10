@@ -2,13 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GuidesFusion360Server.Models
 {
-    public class ModelAnnotationModel
+    public class ModelAnnotation
     {
         public int Id { get; set; }
 
         public int GuideId { get; set; }
 
-        public GuideModel Guide { get; set; }
+        public Guide Guide { get; set; }
 
         public double X { get; set; }
 

@@ -7,8 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using GuidesFusion360Server.Data.Repositories;
-using GuidesFusion360Server.Dtos;
+using GuidesFusion360Server.Dtos.Users;
 using GuidesFusion360Server.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,16 +19,33 @@ namespace GuidesFusion360Server.Services
     public class UsersService : IUsersService
     {
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
         private readonly IUsersRepository _usersRepository;
         private readonly IGuidesRepository _guidesRepository;
 
+        private int GetUserId
+        {
+            get
+            {
+                try
+                {
+                    return int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+
         private static readonly List<Tuple<string, string, DateTime>> RestorePasswordCodes;
 
-        public UsersService(IMapper mapper, IConfiguration configuration, IUsersRepository usersRepository,
-            IGuidesRepository guidesRepository)
+        public UsersService(IMapper mapper, IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
+            IUsersRepository usersRepository, IGuidesRepository guidesRepository)
         {
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _usersRepository = usersRepository;
             _guidesRepository = guidesRepository;
@@ -39,14 +57,14 @@ namespace GuidesFusion360Server.Services
         }
 
         /// <inheritdoc />
-        public async Task<ServiceResponseModel<string>> GetUserAccess(int userId)
+        public async Task<ServiceResponse<string>> GetUserAccessData()
         {
-            var serviceResponse = new ServiceResponseModel<string>();
+            var serviceResponse = new ServiceResponse<string>();
 
-            var user = await _usersRepository.GetUser(userId);
+            var user = await _usersRepository.GetUser(GetUserId);
             if (user == null)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User with given id was not found.";
                 return serviceResponse;
             }
@@ -56,14 +74,14 @@ namespace GuidesFusion360Server.Services
         }
 
         /// <inheritdoc />
-        public async Task<ServiceResponseModel<string>> GetUserToken(string email, string password)
+        public async Task<ServiceResponse<string>> GetUserToken(string email, string password)
         {
-            var serviceResponse = new ServiceResponseModel<string>();
+            var serviceResponse = new ServiceResponse<string>();
 
             var user = await _usersRepository.GetUser(email);
             if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User with given email or password was not found.";
                 return serviceResponse;
             }
@@ -73,18 +91,18 @@ namespace GuidesFusion360Server.Services
         }
 
         /// <inheritdoc />
-        public async Task<ServiceResponseModel<string>> CreateNewUser(UserRegisterDto userData)
+        public async Task<ServiceResponse<string>> CreateNewUser(UserRegisterDto userData)
         {
-            var serviceResponse = new ServiceResponseModel<string>();
+            var serviceResponse = new ServiceResponse<string>();
 
             if (await _usersRepository.UserExists(userData.Email))
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User with this email already exists.";
                 return serviceResponse;
             }
 
-            var user = new UserModel
+            var user = new User
             {
                 Email = userData.Email,
                 FirstName = userData.FirstName,
@@ -98,40 +116,41 @@ namespace GuidesFusion360Server.Services
 
             var userId = await _usersRepository.AddUser(user);
 
+            serviceResponse.StatusCode = 201;
             serviceResponse.Data = CreateToken(userId, user.Email);
             serviceResponse.Message = "User is created successfully.";
             return serviceResponse;
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<ServiceResponseModel<string>, int>> RestorePassword(string restoreCode, string password)
+        public async Task<ServiceResponse<string>> RestorePassword(string restoreCode, string password)
         {
-            var serviceResponse = new ServiceResponseModel<string>();
+            var serviceResponse = new ServiceResponse<string>();
 
             var restoreData = RestorePasswordCodes.FirstOrDefault(x => x.Item1 == restoreCode);
 
             if (restoreData == null)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "Restore code is not found.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 404);
+                return serviceResponse;
             }
 
             if (DateTime.Now > restoreData.Item3)
             {
                 RestorePasswordCodes.Remove(restoreData);
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "Restore code is expired.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 401);
+                return serviceResponse;
             }
 
             var user = await _usersRepository.GetUser(restoreData.Item2);
 
             if (VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot use the same password.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 400);
+                return serviceResponse;
             }
 
             RestorePasswordCodes.Remove(restoreData);
@@ -145,15 +164,13 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = CreateToken(user.Id, user.Email);
             serviceResponse.Message = "Password changed successfully.";
-            return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 200);
+            return serviceResponse;
         }
 
         /// <inheritdoc />
-        public async Task<ServiceResponseModel<List<GetUsersDto>>> GetUsers(int userId)
+        public async Task<ServiceResponse<List<GetUserDto>>> GetUsers()
         {
-            var serviceResponse = new ServiceResponseModel<List<GetUsersDto>>();
-
-            var (isAdmin, accessResponse, statusCode) = await RequesterIsAdmin<List<GetUsersDto>>(userId);
+            var (isAdmin, accessResponse) = await RequesterIsAdmin<List<GetUserDto>>();
             if (!isAdmin)
             {
                 return accessResponse;
@@ -161,53 +178,54 @@ namespace GuidesFusion360Server.Services
 
             var users = await _usersRepository.GetUsers();
 
-            serviceResponse.Data = users.Select(x => _mapper.Map<GetUsersDto>(x)).ToList();
-            return serviceResponse;
+            return new ServiceResponse<List<GetUserDto>>
+            {
+                Data = users.Select(x => _mapper.Map<GetUserDto>(x)).ToList()
+            };
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>> GetUserGuides(int userId,
-            int requesterId)
+        public async Task<ServiceResponse<List<GetUserGuideDto>>> GetUserGuides(int userId)
         {
-            var (isAdmin, accessResponse, statusCode) = await RequesterIsAdmin<List<GetUserGuidesDto>>(requesterId);
+            var (isAdmin, accessResponse) = await RequesterIsAdmin<List<GetUserGuideDto>>();
             if (!isAdmin)
             {
-                return new Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>(accessResponse, statusCode);
+                return accessResponse;
             }
 
-            var serviceResponse = new ServiceResponseModel<List<GetUserGuidesDto>>();
+            var serviceResponse = new ServiceResponse<List<GetUserGuideDto>>();
 
             var user = await _usersRepository.GetUser(userId);
             if (user == null)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
-                return new Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>(serviceResponse, 404);
+                return serviceResponse;
             }
 
             var allGuides = await _guidesRepository.GetAllGuides();
             var userGuides = allGuides.Where(x => x.OwnerId == userId).ToList();
 
-            serviceResponse.Data = userGuides.Select(x => _mapper.Map<GetUserGuidesDto>(x)).ToList();
-            return new Tuple<ServiceResponseModel<List<GetUserGuidesDto>>, int>(serviceResponse, 200);
+            serviceResponse.Data = userGuides.Select(x => _mapper.Map<GetUserGuideDto>(x)).ToList();
+            return serviceResponse;
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<ServiceResponseModel<string>, int>> GetPasswordRestoreCode(string email, int userId)
+        public async Task<ServiceResponse<string>> GetPasswordRestoreCode(string email)
         {
-            var serviceResponse = new ServiceResponseModel<string>();
-
-            var (isAdmin, accessResponse, statusCode) = await RequesterIsAdmin<string>(userId);
+            var (isAdmin, accessResponse) = await RequesterIsAdmin<string>();
             if (!isAdmin)
             {
-                return new Tuple<ServiceResponseModel<string>, int>(accessResponse, statusCode);
+                return accessResponse;
             }
+
+            var serviceResponse = new ServiceResponse<string>();
 
             if (!await _usersRepository.UserExists(email))
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 404);
+                return serviceResponse;
             }
 
             // This isn't quite secure but this is a student project and those guides are backed up anyway.  
@@ -224,49 +242,48 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = restoreCode;
             serviceResponse.Message = "Send this restore code to the user.";
-            return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 200);
+            return serviceResponse;
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<ServiceResponseModel<string>, int>> UpdateUserAccess(string email, string access,
-            int userId)
+        public async Task<ServiceResponse<string>> UpdateUserAccess(string email, string access)
         {
-            var serviceResponse = new ServiceResponseModel<string>();
-
-            var (isAdmin, accessResponse, statusCode) = await RequesterIsAdmin<string>(userId);
+            var (isAdmin, accessResponse) = await RequesterIsAdmin<string>();
             if (!isAdmin)
             {
-                return new Tuple<ServiceResponseModel<string>, int>(accessResponse, statusCode);
+                return accessResponse;
             }
+
+            var serviceResponse = new ServiceResponse<string>();
 
             if (access != "unknown" && access != "editor")
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "New access should be 'unknown' or 'editor'.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 400);
+                return serviceResponse;
             }
 
             var user = await _usersRepository.GetUser(email);
 
             if (user == null)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 404);
+                return serviceResponse;
             }
 
-            if (user.Id == userId)
+            if (user.Id == GetUserId)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot change access level for yourself.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 400);
+                return serviceResponse;
             }
 
             if (user.Access == "admin")
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot change access level of another admin.";
-                return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 400);
+                return serviceResponse;
             }
 
             user.Access = access;
@@ -274,41 +291,42 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = access;
             serviceResponse.Message = "New access level is set.";
-            return new Tuple<ServiceResponseModel<string>, int>(serviceResponse, 200);
+            return serviceResponse;
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<ServiceResponseModel<int>, int>> DeleteUser(string email, int userId)
+        public async Task<ServiceResponse<int>> DeleteUser(string email)
         {
-            var serviceResponse = new ServiceResponseModel<int>();
-
-            var (isAdmin, accessResponse, statusCode) = await RequesterIsAdmin<int>(userId);
+            var (isAdmin, accessResponse) = await RequesterIsAdmin<int>();
             if (!isAdmin)
             {
-                return new Tuple<ServiceResponseModel<int>, int>(accessResponse, statusCode);
+                return accessResponse;
             }
 
+            var serviceResponse = new ServiceResponse<int>();
+
+            var userId = GetUserId;
             var user = await _usersRepository.GetUser(email);
 
             if (user == null)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
-                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 404);
+                return serviceResponse;
             }
 
             if (user.Id == userId)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot delete yourself.";
-                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 400);
+                return serviceResponse;
             }
 
             if (user.Access == "admin")
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot delete another admin.";
-                return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 400);
+                return serviceResponse;
             }
 
             var userGuides = await _guidesRepository.GetAllGuides();
@@ -321,26 +339,24 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = userGuides.Count;
             serviceResponse.Message = "User is removed";
-            return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 200);
+            return serviceResponse;
         }
 
         /// <summary>Checks if requests is admin.</summary>
-        /// <param name="userId">Id of the requester.</param>
         /// <returns>Returns service response and http code.</returns>
-        private async Task<Tuple<bool, ServiceResponseModel<T>, int>> RequesterIsAdmin<T>(int userId)
+        private async Task<Tuple<bool, ServiceResponse<T>>> RequesterIsAdmin<T>()
         {
-            var serviceResponse = new ServiceResponseModel<T>();
+            var serviceResponse = new ServiceResponse<T>();
 
-            var requesterIsAdmin = await _usersRepository.UserIsAdmin(userId);
-
+            var requesterIsAdmin = await _usersRepository.UserIsAdmin(GetUserId);
             if (!requesterIsAdmin)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "User should be an admin to make a such request.";
-                return new Tuple<bool, ServiceResponseModel<T>, int>(false, serviceResponse, 401);
+                return new Tuple<bool, ServiceResponse<T>>(false, serviceResponse);
             }
 
-            return new Tuple<bool, ServiceResponseModel<T>, int>(true, serviceResponse, 200);
+            return new Tuple<bool, ServiceResponse<T>>(true, serviceResponse);
         }
 
         /// <summary>Creates password hash.</summary>
@@ -378,8 +394,8 @@ namespace GuidesFusion360Server.Services
                 new Claim(ClaimTypes.Name, email)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 

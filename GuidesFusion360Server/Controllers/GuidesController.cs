@@ -1,12 +1,8 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using GuidesFusion360Server.Dtos;
+using GuidesFusion360Server.Dtos.Guides;
 using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuidesFusion360Server.Controllers
@@ -27,225 +23,136 @@ namespace GuidesFusion360Server.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPublicGuides()
         {
-            return Ok(await _guidesService.GetAllPublicGuides());
+            var serviceResponse = await _guidesService.GetAllPublicGuides();
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpGet("all-hidden")]
         public async Task<IActionResult> GetAllHiddenGuides()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-            var serviceResponse = await _guidesService.GetAllHiddenGuides(userId);
+            var serviceResponse = await _guidesService.GetAllHiddenGuides();
 
-            if (!serviceResponse.Success)
-            {
-                return Unauthorized(serviceResponse);
-            }
-
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [AllowAnonymous]
         [HttpGet("parts-public/{guideId}")]
         public async Task<IActionResult> GetPublicPartGuides([Required] int guideId)
         {
-            var (serviceResponse, statusCode) = await _guidesService.GetPartGuides(guideId, -1);
+            var serviceResponse = await _guidesService.GetPartGuides(guideId);
 
-            return statusCode switch
-            {
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpGet("parts/{guideId}")]
         public async Task<IActionResult> GetPrivatePartGuides([Required] int guideId)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.GetPartGuides(guideId);
 
-            var (serviceResponse, statusCode) = await _guidesService.GetPartGuides(guideId, userId);
-
-            return statusCode switch
-            {
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [AllowAnonymous]
         [HttpGet("file-public/{guideId}")]
         public async Task<IActionResult> GetPublicGuideFile([Required] int guideId, [Required] string filename)
         {
-            var (serviceResponse, statusCode) = await _guidesService.GetGuideFile(guideId, filename, -1);
+            var serviceResponse = await _guidesService.GetGuideFile(guideId, filename);
 
-            return statusCode switch
+            if (serviceResponse.StatusCode == 200)
             {
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => serviceResponse.Data
-            };
+                return serviceResponse.Data;
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpGet("file/{guideId}")]
         public async Task<IActionResult> GetPrivateGuideFile([Required] int guideId, [Required] string filename)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.GetGuideFile(guideId, filename);
 
-            var (serviceResponse, statusCode) = await _guidesService.GetGuideFile(guideId, filename, userId);
-
-            return statusCode switch
+            if (serviceResponse.StatusCode == 200)
             {
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => serviceResponse.Data
-            };
+                return serviceResponse.Data;
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpGet("owner/{guideId}")]
         public async Task<IActionResult> GetGuideOwner([Required] int guideId)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-            var (serviceResponse, statusCode) = await _guidesService.GetGuideOwner(guideId, userId);
+            var serviceResponse = await _guidesService.GetGuideOwner(guideId);
 
-            return statusCode switch
-            {
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpPost("guide")]
         public async Task<IActionResult> CreateNewGuide([FromForm] AddGuideDto guide)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.CreateGuide(guide);
 
-            var (serviceResponse, statusCode) = await _guidesService.CreateGuide(userId, guide);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [DisableRequestSizeLimit]
         [HttpPost("part-guide")]
         public async Task<IActionResult> CreateNewPartGuide([FromForm] AddPartGuideDto guide)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.CreatePartGuide(guide);
 
-            var (serviceResponse, statusCode) = await _guidesService.CreatePartGuide(userId, guide);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [DisableRequestSizeLimit]
         [HttpPost("model")]
         public async Task<IActionResult> UploadModel([FromForm] AddGuideModelDto model)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.UploadModel(model);
 
-            var (serviceResponse, statusCode) = await _guidesService.UploadModel(userId, model);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                500 => StatusCode(StatusCodes.Status500InternalServerError, serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpPut("hidden/{guideId}")]
         public async Task<IActionResult> ChangeGuideVisibility([Required] int guideId, [Required] string hidden)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.ChangeGuideVisibility(guideId, hidden);
 
-            var (serviceResponse, statusCode) = await _guidesService.ChangeGuideVisibility(userId, guideId, hidden);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [DisableRequestSizeLimit]
         [HttpPut("part-guide/{id}")]
         public async Task<IActionResult> UpdatePartGuide([Required] int id, [FromForm] UpdatePartGuideDto updatedGuide)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.UpdatePartGuide(id, updatedGuide);
 
-            var (serviceResponse, statusCode) = await _guidesService.UpdatePartGuide(userId, id, updatedGuide);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpPut("switch")]
         public async Task<IActionResult> SwitchPartGuides([Required] int partGuideId1, [Required] int partGuideId2)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.SwitchPartGuides(partGuideId1, partGuideId2);
 
-            var (serviceResponse, statusCode) =
-                await _guidesService.SwitchPartGuides(userId, partGuideId1, partGuideId2);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpDelete("guide/{guideId}")]
         public async Task<IActionResult> RemoveGuide([Required] int guideId)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.RemoveGuide(guideId);
 
-            var (serviceResponse, statusCode) = await _guidesService.RemoveGuide(userId, guideId);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpDelete("part-guide/{id}")]
         public async Task<IActionResult> RemovePartGuide([Required] int id)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _guidesService.RemovePartGuide(id);
 
-            var (serviceResponse, statusCode) = await _guidesService.RemovePartGuide(userId, id);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
     }
 }

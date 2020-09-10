@@ -10,21 +10,21 @@ namespace GuidesFusion360Server.Data.Repositories
         /// <summary>Add user to db.</summary>
         /// <param name="user">User data.</param>
         /// <returns>Returns user id.</returns>
-        Task<int> AddUser(UserModel user);
+        Task<int> AddUser(User user);
 
         /// <summary>Gets user by id.</summary>
         /// <param name="userId">Id of the user.</param>
         /// <returns>Returns user data.</returns>
-        Task<UserModel> GetUser(int userId);
+        Task<User> GetUser(int userId);
 
         /// <summary>Gets user by email.</summary>
         /// <param name="email">Email of the user.</param>
         /// <returns>Returns user data.</returns>
-        Task<UserModel> GetUser(string email);
+        Task<User> GetUser(string email);
 
         /// <summary>Gets all users data.</summary>
         /// <returns>Returns list of all users.</returns>
-        Task<List<UserModel>> GetUsers();
+        Task<List<User>> GetUsers();
 
         /// <summary>Checks if user with given email exists.</summary>
         /// <param name="email">Email of the user.</param>
@@ -43,10 +43,10 @@ namespace GuidesFusion360Server.Data.Repositories
 
         /// <summary>Updates user data.</summary>
         /// <param name="user">User data.</param>
-        Task UpdateUser(UserModel user);
+        Task UpdateUser(User user);
 
         /// <summary>Removes user.</summary>
         /// <param name="user">User data.</param>
-        Task RemoveUser(UserModel user);
+        Task RemoveUser(User user);
     }
 }

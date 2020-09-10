@@ -1,6 +1,6 @@
-namespace GuidesFusion360Server.Dtos
+namespace GuidesFusion360Server.Dtos.Users
 {
-    public class GetUserGuidesDto
+    public class GetUserGuideDto
     {
         public int Id { get; set; }
 

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GuidesFusion360Server.Models
 {
-    public class UserModel
+    public class User
     {
         public int Id { get; set; }
 
@@ -19,6 +19,6 @@ namespace GuidesFusion360Server.Models
 
         [Required] public byte[] PasswordSalt { get; set; }
 
-        public ICollection<GuideModel> Guides { get; set; }
+        public ICollection<Guide> Guides { get; set; }
     }
 }

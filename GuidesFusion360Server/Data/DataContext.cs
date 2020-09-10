@@ -10,29 +10,29 @@ namespace GuidesFusion360Server.Data
         {
         }
 
-        public DbSet<UserModel> Users { get; set; }
+        public DbSet<User> Users { get; set; }
 
-        public DbSet<GuideModel> Guides { get; set; }
+        public DbSet<Guide> Guides { get; set; }
 
-        public DbSet<PartGuideModel> PartGuides { get; set; }
+        public DbSet<PartGuide> PartGuides { get; set; }
 
-        public DbSet<ModelAnnotationModel> ModelAnnotations { get; set; }
+        public DbSet<ModelAnnotation> ModelAnnotations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserModel>()
+            modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
-            modelBuilder.Entity<GuideModel>()
+            modelBuilder.Entity<Guide>()
                 .HasOne(x => x.Owner)
                 .WithMany(x => x.Guides);
 
-            modelBuilder.Entity<PartGuideModel>()
+            modelBuilder.Entity<PartGuide>()
                 .HasOne(x => x.Guide)
                 .WithMany(x => x.PartGuides);
 
-            modelBuilder.Entity<ModelAnnotationModel>()
+            modelBuilder.Entity<ModelAnnotation>()
                 .HasOne(x => x.Guide)
                 .WithMany(x => x.ModelAnnotations);
         }

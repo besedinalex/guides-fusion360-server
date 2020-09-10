@@ -16,7 +16,7 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<int> AddUser(UserModel user)
+        public async Task<int> AddUser(User user)
         {
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -25,14 +25,14 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public Task<UserModel> GetUser(int userId) =>
+        public Task<User> GetUser(int userId) =>
             _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
         /// <inheritdoc />
-        public Task<UserModel> GetUser(string email) =>
+        public Task<User> GetUser(string email) =>
             _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
 
-        public Task<List<UserModel>> GetUsers() =>
+        public Task<List<User>> GetUsers() =>
             _context.Users.ToListAsync();
 
         /// <inheritdoc />
@@ -54,14 +54,14 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public Task UpdateUser(UserModel user)
+        public Task UpdateUser(User user)
         {
             _context.Users.Update(user);
             return _context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task RemoveUser(UserModel user)
+        public Task RemoveUser(User user)
         {
             _context.Users.Remove(user);
             return _context.SaveChangesAsync();

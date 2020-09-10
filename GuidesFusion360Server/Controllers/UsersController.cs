@@ -1,9 +1,6 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using GuidesFusion360Server.Dtos;
+using GuidesFusion360Server.Dtos.Users;
 using GuidesFusion360Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,16 +22,9 @@ namespace GuidesFusion360Server.Controllers
         [HttpGet("access-self")]
         public async Task<IActionResult> GetUserAccess()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _usersService.GetUserAccessData();
 
-            var serviceResponse = await _usersService.GetUserAccess(userId);
-
-            if (!serviceResponse.Success)
-            {
-                return NotFound(serviceResponse);
-            }
-
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [AllowAnonymous]
@@ -43,12 +33,7 @@ namespace GuidesFusion360Server.Controllers
         {
             var serviceResponse = await _usersService.GetUserToken(email, password);
 
-            if (!serviceResponse.Success)
-            {
-                return NotFound(serviceResponse);
-            }
-
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [AllowAnonymous]
@@ -57,105 +42,56 @@ namespace GuidesFusion360Server.Controllers
         {
             var serviceResponse = await _usersService.CreateNewUser(newUser);
 
-            if (!serviceResponse.Success)
-            {
-                return BadRequest(serviceResponse);
-            }
-
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [AllowAnonymous]
         [HttpPut("restore-password")]
         public async Task<IActionResult> RestorePassword([Required] string restoreCode, [Required] string password)
         {
-            var (serviceResponse, statusCode) = await _usersService.RestorePassword(restoreCode, password);
+            var serviceResponse = await _usersService.RestorePassword(restoreCode, password);
 
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _usersService.GetUsers();
 
-            var serviceResponse = await _usersService.GetUsers(userId);
-
-            if (!serviceResponse.Success)
-            {
-                return Unauthorized(serviceResponse);
-            }
-
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpGet("guides/{userId}")]
         public async Task<IActionResult> GetUserGuides([Required] int userId)
         {
-            var requesterId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _usersService.GetUserGuides(userId);
 
-            var (serviceResponse, statusCode) = await _usersService.GetUserGuides(userId, requesterId);
-
-            return statusCode switch
-            {
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpGet("password-restore-code")]
         public async Task<IActionResult> GetRestorePasswordCode([Required] string email)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _usersService.GetPasswordRestoreCode(email);
 
-            var (serviceResponse, statusCode) = await _usersService.GetPasswordRestoreCode(email, userId);
-
-            return statusCode switch
-            {
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpPut("access")]
         public async Task<IActionResult> UpdateUserAccess(UpdateUserAccessDto userData)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _usersService.UpdateUserAccess(userData.Email, userData.Access);
 
-            var (serviceResponse, statusCode) =
-                await _usersService.UpdateUserAccess(userData.Email, userData.Access, userId);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
 
         [HttpDelete("user")]
         public async Task<IActionResult> DeleteUser([Required] string email)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var serviceResponse = await _usersService.DeleteUser(email);
 
-            var (serviceResponse, statusCode) = await _usersService.DeleteUser(email, userId);
-
-            return statusCode switch
-            {
-                400 => BadRequest(serviceResponse),
-                401 => Unauthorized(serviceResponse),
-                404 => NotFound(serviceResponse),
-                _ => Ok(serviceResponse)
-            };
+            return StatusCode(serviceResponse.StatusCode, serviceResponse.ToControllerResponse());
         }
     }
 }

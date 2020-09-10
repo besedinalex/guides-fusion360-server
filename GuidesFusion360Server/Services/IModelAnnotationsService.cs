@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GuidesFusion360Server.Dtos;
+using GuidesFusion360Server.Dtos.ModelAnnotations;
 using GuidesFusion360Server.Models;
 
 namespace GuidesFusion360Server.Services
@@ -10,28 +9,21 @@ namespace GuidesFusion360Server.Services
     {
         /// <summary>Requests public model annotations.</summary>
         /// <param name="guideId">Id of the guide.</param>
-        /// <returns>Returns list of annotations and http code.</returns>
-        public Task<Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>> GetPublicModelAnnotations(
-            int guideId);
+        /// <returns>Returns list of annotations.</returns>
+        public Task<ServiceResponse<List<GetModelAnnotationDto>>> GetPublicModelAnnotations(int guideId);
 
         /// <summary>Requests private model annotations.</summary>
         /// <param name="guideId">Id of the guide.</param>
-        /// <param name="userId">Id of the requester.</param>
-        /// <returns>Returns list of annotations and http code.</returns>
-        public Task<Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>> GetPrivateModelAnnotations(
-            int guideId, int userId);
+        /// <returns>Returns list of annotations.</returns>
+        public Task<ServiceResponse<List<GetModelAnnotationDto>>> GetPrivateModelAnnotations(int guideId);
 
         /// <summary>Requests to add annotation.</summary>
         /// <param name="newAnnotation">Annotation data.</param>
-        /// <param name="userId">Id of the requester.</param>
-        /// <returns>Returns id of the new annotation and http code.</returns>
-        public Task<Tuple<ServiceResponseModel<int>, int>> AddModelAnnotation(AddModelAnnotationDto newAnnotation,
-            int userId);
+        /// <returns>Returns id of the new annotation.</returns>
+        public Task<ServiceResponse<int>> AddModelAnnotation(AddModelAnnotationDto newAnnotation);
 
         /// <summary>Requests to delete annotation.</summary>
         /// <param name="annotationId">Id of the annotation.</param>
-        /// <param name="userId">Id of the requester.</param>
-        /// <returns>Returns http code.</returns>
-        public Task<Tuple<ServiceResponseModel<int>, int>> RemoveAnnotation(int annotationId, int userId);
+        public Task<ServiceResponse<int>> RemoveAnnotation(int annotationId);
     }
 }

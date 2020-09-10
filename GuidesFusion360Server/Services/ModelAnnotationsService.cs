@@ -1,164 +1,123 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using GuidesFusion360Server.Data.Repositories;
-using GuidesFusion360Server.Dtos;
+using GuidesFusion360Server.Dtos.ModelAnnotations;
 using GuidesFusion360Server.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace GuidesFusion360Server.Services
 {
     public class ModelAnnotationsService : IModelAnnotationsService
     {
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IModelAnnotationsRepository _modelAnnotationsRepository;
-        private readonly IGuidesRepository _guidesRepository;
         private readonly IUsersRepository _usersRepository;
+        private readonly IGuidesService _guidesService;
 
-        public ModelAnnotationsService(IMapper mapper, IModelAnnotationsRepository modelAnnotationsRepository,
-            IGuidesRepository guidesRepository, IUsersRepository usersRepository)
+        private int GetUserId
+        {
+            get
+            {
+                try
+                {
+                    return int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+
+        public ModelAnnotationsService(IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            IModelAnnotationsRepository modelAnnotationsRepository, IUsersRepository usersRepository,
+            IGuidesService guidesService)
         {
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
             _modelAnnotationsRepository = modelAnnotationsRepository;
-            _guidesRepository = guidesRepository;
             _usersRepository = usersRepository;
+            _guidesService = guidesService;
         }
 
-        public async Task<Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>> GetPublicModelAnnotations(
-            int guideId)
+        /// <inheritdoc />
+        public async Task<ServiceResponse<List<GetModelAnnotationDto>>> GetPublicModelAnnotations(int guideId)
         {
-            var (isPublic, accessResponse, statusCode) = await GuideIsPublic<List<GetModelAnnotationsDto>>(guideId);
+            var (isPublic, accessResponse, guide) =
+                await _guidesService.GuideIsPublic<List<GetModelAnnotationDto>>(guideId);
             if (!isPublic)
             {
-                return new Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>(accessResponse, statusCode);
+                return accessResponse;
             }
 
             var annotations = await _modelAnnotationsRepository.GetAnnotations(guideId);
 
-            var serviceResponse = new ServiceResponseModel<List<GetModelAnnotationsDto>>
+            return new ServiceResponse<List<GetModelAnnotationDto>>
             {
-                Data = annotations.Select(x => _mapper.Map<GetModelAnnotationsDto>(x)).ToList()
+                Data = annotations.Select(x => _mapper.Map<GetModelAnnotationDto>(x)).ToList()
             };
-
-            return new Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>(serviceResponse, 200);
         }
 
-        public async Task<Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>> GetPrivateModelAnnotations(
-            int guideId, int userId)
+        /// <inheritdoc />
+        public async Task<ServiceResponse<List<GetModelAnnotationDto>>> GetPrivateModelAnnotations(int guideId)
         {
-            var serviceResponse = new ServiceResponseModel<List<GetModelAnnotationsDto>>();
+            var serviceResponse = new ServiceResponse<List<GetModelAnnotationDto>>();
 
-            var hasAccess = await _usersRepository.UserIsEditor(userId);
+            var hasAccess = await _usersRepository.UserIsEditor(GetUserId);
             if (!hasAccess)
             {
-                serviceResponse.Success = false;
+                serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "User access should be editor or admin.";
-                return new Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>(serviceResponse, 401);
+                return serviceResponse;
             }
 
             var annotations = await _modelAnnotationsRepository.GetAnnotations(guideId);
 
-            serviceResponse.Data = annotations.Select(x => _mapper.Map<GetModelAnnotationsDto>(x)).ToList();
-            return new Tuple<ServiceResponseModel<List<GetModelAnnotationsDto>>, int>(serviceResponse, 200);
+            serviceResponse.Data = annotations.Select(x => _mapper.Map<GetModelAnnotationDto>(x)).ToList();
+            return serviceResponse;
         }
 
-        public async Task<Tuple<ServiceResponseModel<int>, int>> AddModelAnnotation(AddModelAnnotationDto newAnnotation,
-            int userId)
+        /// <inheritdoc />
+        public async Task<ServiceResponse<int>> AddModelAnnotation(AddModelAnnotationDto newAnnotation)
         {
-            var (isEditable, accessResponse, statusCode) = await GuideIsEditable<int>(userId, newAnnotation.GuideId);
+            var (isEditable, accessResponse, guide) = await _guidesService.GuideIsEditable<int>(newAnnotation.GuideId);
             if (!isEditable)
             {
-                return new Tuple<ServiceResponseModel<int>, int>(accessResponse, statusCode);
+                return accessResponse;
             }
 
-            var annotation = _mapper.Map<ModelAnnotationModel>(newAnnotation);
+            var annotation = _mapper.Map<ModelAnnotation>(newAnnotation);
 
             var annotationId = await _modelAnnotationsRepository.AddAnnotation(annotation);
 
-            var serviceResponse = new ServiceResponseModel<int>
-            {
-                Data = annotationId,
-                Message = "Annotation is added successfully."
-            };
-            return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 200);
+            return new ServiceResponse<int>
+                {StatusCode = 201, Data = annotationId, Message = "Annotation is successfully created."};
         }
 
-        public async Task<Tuple<ServiceResponseModel<int>, int>> RemoveAnnotation(int annotationId, int userId)
+        /// <inheritdoc />
+        public async Task<ServiceResponse<int>> RemoveAnnotation(int annotationId)
         {
             var annotation = await _modelAnnotationsRepository.GetAnnotation(annotationId);
-            var (isEditable, accessResponse, statusCode) = await GuideIsEditable<int>(userId, annotation.GuideId);
+
+            if (annotation == null)
+            {
+                return new ServiceResponse<int> {StatusCode = 404, Message = "Annotation is not found"};
+            }
+
+            var (isEditable, accessResponse, guide) = await _guidesService.GuideIsEditable<int>(annotation.GuideId);
             if (!isEditable)
             {
-                return new Tuple<ServiceResponseModel<int>, int>(accessResponse, statusCode);
+                return accessResponse;
             }
 
             await _modelAnnotationsRepository.DeleteAnnotation(annotation);
 
-            var serviceResponse = new ServiceResponseModel<int> {Message = "Annotation is deleted successfully."};
-            return new Tuple<ServiceResponseModel<int>, int>(serviceResponse, 200);
-        }
-
-        /// <summary>Checks if guide is available for edit and if it exists at all.</summary>
-        /// <param name="guideId">Id of the guide.</param>
-        /// <typeparam name="T">Type of service response.</typeparam>
-        /// <returns>Returns service response, http code of response and guide itself.</returns>
-        private async Task<Tuple<bool, ServiceResponseModel<T>, int>> GuideIsPublic<T>(int guideId)
-        {
-            var serviceResponse = new ServiceResponseModel<T>();
-
-            var guide = await _guidesRepository.GetGuide(guideId);
-
-            if (guide == null)
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "Guide with this id was not found.";
-                return new Tuple<bool, ServiceResponseModel<T>, int>(false, serviceResponse, 404);
-            }
-
-            if (guide.Hidden == "true")
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "Guide with this id is not public.";
-                return new Tuple<bool, ServiceResponseModel<T>, int>(false, serviceResponse, 401);
-            }
-
-            return new Tuple<bool, ServiceResponseModel<T>, int>(true, serviceResponse, 200);
-        }
-
-        /// <summary>Checks if guide is editable with current access level.</summary>
-        /// <param name="userId">Id of the user who will edit the guide.</param>
-        /// <param name="guideId">Id of the guide.</param>
-        /// <typeparam name="T">Type of service response.</typeparam>
-        /// <returns>Returns service response, http code of response and guide itself.</returns>
-        private async Task<Tuple<bool, ServiceResponseModel<T>, int>> GuideIsEditable<T>(int userId, int guideId)
-        {
-            var serviceResponse = new ServiceResponseModel<T>();
-
-            var isEditor = await _usersRepository.UserIsEditor(userId);
-            if (!isEditor)
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "User access should be editor or admin.";
-                return new Tuple<bool, ServiceResponseModel<T>, int>(false, serviceResponse, 401);
-            }
-
-            var guide = await _guidesRepository.GetGuide(guideId);
-            if (guide == null)
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "Guide with this id was not found.";
-                return new Tuple<bool, ServiceResponseModel<T>, int>(false, serviceResponse, 404);
-            }
-
-            if (guide.Hidden == "false")
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = "Guide should be hidden in order to edit it.";
-                return new Tuple<bool, ServiceResponseModel<T>, int>(false, serviceResponse, 400);
-            }
-
-            return new Tuple<bool, ServiceResponseModel<T>, int>(true, serviceResponse, 200);
+            return new ServiceResponse<int> {Message = "Annotation is deleted successfully."};
         }
     }
 }

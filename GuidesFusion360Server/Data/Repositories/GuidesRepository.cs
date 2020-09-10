@@ -17,31 +17,31 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public Task<GuideModel> GetGuide(int guideId) =>
+        public Task<Guide> GetGuide(int guideId) =>
             _context.Guides.FirstOrDefaultAsync(x => x.Id == guideId);
 
         /// <inheritdoc />
-        public Task<List<GuideModel>> GetAllGuides() =>
+        public Task<List<Guide>> GetAllGuides() =>
             _context.Guides.ToListAsync();
 
         /// <inheritdoc />
-        public Task<List<GuideModel>> GetAllPublicGuides() =>
+        public Task<List<Guide>> GetAllPublicGuides() =>
             _context.Guides.Where(x => x.Hidden == "false").ToListAsync();
 
         /// <inheritdoc />
-        public Task<List<GuideModel>> GetAllHiddenGuides() =>
+        public Task<List<Guide>> GetAllHiddenGuides() =>
             _context.Guides.Where(x => x.Hidden == "true").ToListAsync();
 
         /// <inheritdoc />
-        public Task<PartGuideModel> GetPartGuide(int partGuideId) =>
+        public Task<PartGuide> GetPartGuide(int partGuideId) =>
             _context.PartGuides.FirstOrDefaultAsync(x => x.Id == partGuideId);
 
         /// <inheritdoc />
-        public Task<List<PartGuideModel>> GetPartGuides(int guideId) =>
+        public Task<List<PartGuide>> GetPartGuides(int guideId) =>
             _context.PartGuides.Where(x => x.GuideId == guideId).ToListAsync();
 
         /// <inheritdoc />
-        public async Task<int> CreateGuide(GuideModel guide)
+        public async Task<int> CreateGuide(Guide guide)
         {
             await _context.Guides.AddAsync(guide);
             await _context.SaveChangesAsync();
@@ -49,7 +49,7 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<int> CreatePartGuide(PartGuideModel partGuide)
+        public async Task<int> CreatePartGuide(PartGuide partGuide)
         {
             await _context.PartGuides.AddAsync(partGuide);
             await _context.SaveChangesAsync();
@@ -57,35 +57,35 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public Task UpdateGuide(GuideModel guide)
+        public Task UpdateGuide(Guide guide)
         {
             _context.Guides.Update(guide);
             return _context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task UpdateGuides(List<GuideModel> guides)
+        public Task UpdateGuides(List<Guide> guides)
         {
             _context.UpdateRange(guides);
             return _context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task UpdatePartGuide(PartGuideModel partGuide)
+        public Task UpdatePartGuide(PartGuide partGuide)
         {
             _context.PartGuides.Update(partGuide);
             return _context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public Task UpdatePartGuides(List<PartGuideModel> partGuides)
+        public Task UpdatePartGuides(List<PartGuide> partGuides)
         {
             _context.PartGuides.UpdateRange(partGuides);
             return _context.SaveChangesAsync();
         }
 
         /// <inheritdoc />
-        public async Task RemoveGuide(GuideModel guide)
+        public async Task RemoveGuide(Guide guide)
         {
             var partGuides = await _context.PartGuides.Where(x => x.GuideId == guide.Id).ToListAsync();
             _context.PartGuides.RemoveRange(partGuides);
@@ -94,7 +94,7 @@ namespace GuidesFusion360Server.Data.Repositories
         }
 
         /// <inheritdoc />
-        public Task RemovePartGuide(PartGuideModel partGuide)
+        public Task RemovePartGuide(PartGuide partGuide)
         {
             _context.PartGuides.Remove(partGuide);
             return _context.SaveChangesAsync();

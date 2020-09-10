@@ -9,24 +9,24 @@ namespace GuidesFusion360Server.Data.Repositories
         /// <summary>Gets annotations from db.</summary>
         /// <param name="annotationId">Id of the annotation.</param>
         /// <returns>Returns all model annotations.</returns>
-        public Task<ModelAnnotationModel> GetAnnotation(int annotationId);
+        public Task<ModelAnnotation> GetAnnotation(int annotationId);
 
         /// <summary>Gets annotations from db.</summary>
         /// <param name="guideId">Id of the guide.</param>
         /// <returns>Returns all model annotations.</returns>
-        public Task<List<ModelAnnotationModel>> GetAnnotations(int guideId);
+        public Task<List<ModelAnnotation>> GetAnnotations(int guideId);
 
         /// <summary>Adds annotation to db.</summary>
         /// <param name="annotation">Annotation data.</param>
         /// <returns>Id of the new annotation.</returns>
-        public Task<int> AddAnnotation(ModelAnnotationModel annotation);
+        public Task<int> AddAnnotation(ModelAnnotation annotation);
 
         /// <summary>Removes annotation from db.</summary>
         /// <param name="annotation">Annotation data.</param>
-        public Task DeleteAnnotation(ModelAnnotationModel annotation);
+        public Task DeleteAnnotation(ModelAnnotation annotation);
 
         /// <summary>Removes annotations from db.</summary>
         /// <param name="annotations">Annotations data.</param>
-        public Task DeleteAnnotations(List<ModelAnnotationModel> annotations);
+        public Task DeleteAnnotations(List<ModelAnnotation> annotations);
     }
 }

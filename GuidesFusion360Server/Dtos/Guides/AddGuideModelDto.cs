@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
-namespace GuidesFusion360Server.Dtos
+namespace GuidesFusion360Server.Dtos.Guides
 {
     public class AddGuideModelDto
     {

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace GuidesFusion360Server.Dtos
+namespace GuidesFusion360Server.Dtos.Users
 {
     public class UpdateUserAccessDto
     {

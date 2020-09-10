@@ -1,5 +1,7 @@
 using AutoMapper;
-using GuidesFusion360Server.Dtos;
+using GuidesFusion360Server.Dtos.Guides;
+using GuidesFusion360Server.Dtos.ModelAnnotations;
+using GuidesFusion360Server.Dtos.Users;
 using GuidesFusion360Server.Models;
 
 namespace GuidesFusion360Server
@@ -11,15 +13,15 @@ namespace GuidesFusion360Server
     {
         public AutoMapperProfile()
         {
-            CreateMap<GuideModel, GetGuidesDto>();
-            CreateMap<PartGuideModel, GetPartGuidesDto>();
-            CreateMap<UserModel, GetGuideOwnerDto>();
-            CreateMap<AddGuideDto, GuideModel>();
-            CreateMap<AddPartGuideDto, PartGuideModel>();
-            CreateMap<UserModel, GetUsersDto>();
-            CreateMap<GuideModel, GetUserGuidesDto>();
-            CreateMap<ModelAnnotationModel, GetModelAnnotationsDto>();
-            CreateMap<AddModelAnnotationDto, ModelAnnotationModel>();
+            CreateMap<Guide, GetGuideDto>();
+            CreateMap<PartGuide, GetPartGuideDto>();
+            CreateMap<User, GetGuideOwnerDto>();
+            CreateMap<AddGuideDto, Guide>();
+            CreateMap<AddPartGuideDto, PartGuide>();
+            CreateMap<User, GetUserDto>();
+            CreateMap<Guide, GetUserGuideDto>();
+            CreateMap<ModelAnnotation, GetModelAnnotationDto>();
+            CreateMap<AddModelAnnotationDto, ModelAnnotation>();
         }
     }
 }
