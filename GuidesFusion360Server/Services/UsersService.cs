@@ -348,7 +348,8 @@ namespace GuidesFusion360Server.Services
                 return serviceResponse;
             }
 
-            var userGuides = await _guidesRepository.GetAllGuides();
+            var guides = await _guidesRepository.GetAllGuides();
+            var userGuides = guides.Where(x => x.OwnerId == user.Id).ToList();
 
             foreach (var guide in userGuides)
                 guide.OwnerId = userId;
