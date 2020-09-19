@@ -9,6 +9,6 @@ namespace GuidesFusion360Server.Models
         public int StatusCode { get; set; } = 200;
 
         public ControllerResponse<T> ToControllerResponse() =>
-            new ControllerResponse<T> {Data = Data, Message = Message};
+            new ControllerResponse<T> {Data = Data, Message = Message, MessageRu = MessageRu};
     }
 }

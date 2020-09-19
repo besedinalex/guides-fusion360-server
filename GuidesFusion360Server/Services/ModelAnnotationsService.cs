@@ -73,6 +73,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "User access should be editor or admin.";
+                serviceResponse.MessageRu = "Пользователь должен быть Редактором или Администратором.";
                 return serviceResponse;
             }
 
@@ -96,7 +97,10 @@ namespace GuidesFusion360Server.Services
             var annotationId = await _modelAnnotationsRepository.AddAnnotation(annotation);
 
             return new ServiceResponse<int>
-                {StatusCode = 201, Data = annotationId, Message = "Annotation is successfully created."};
+            {
+                StatusCode = 201, Data = annotationId, Message = "Annotation is successfully created.",
+                MessageRu = "Аннотация успешно создана."
+            };
         }
 
         /// <inheritdoc />
@@ -106,7 +110,8 @@ namespace GuidesFusion360Server.Services
 
             if (annotation == null)
             {
-                return new ServiceResponse<int> {StatusCode = 404, Message = "Annotation is not found"};
+                return new ServiceResponse<int>
+                    {StatusCode = 404, Message = "Annotation is not found.", MessageRu = "Аннотация не найдена."};
             }
 
             var (isEditable, accessResponse, guide) = await _guidesService.GuideIsEditable<int>(annotation.GuideId);
@@ -117,7 +122,8 @@ namespace GuidesFusion360Server.Services
 
             await _modelAnnotationsRepository.DeleteAnnotation(annotation);
 
-            return new ServiceResponse<int> {Message = "Annotation is deleted successfully."};
+            return new ServiceResponse<int>
+                {Message = "Annotation is deleted successfully.", MessageRu = "Аннотация успешно удалена."};
         }
     }
 }

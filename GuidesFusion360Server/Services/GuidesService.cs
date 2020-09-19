@@ -75,6 +75,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "User access should be editor or admin.";
+                serviceResponse.MessageRu = "Пользователь должен быть Редактором или Администратором.";
                 return serviceResponse;
             }
 
@@ -108,6 +109,7 @@ namespace GuidesFusion360Server.Services
                 {
                     serviceResponse.StatusCode = 401;
                     serviceResponse.Message = "User access should be editor or admin.";
+                    serviceResponse.MessageRu = "Пользователь должен быть Редактором или Администратором.";
                     return serviceResponse;
                 }
             }
@@ -143,6 +145,7 @@ namespace GuidesFusion360Server.Services
                 {
                     serviceResponse.StatusCode = 401;
                     serviceResponse.Message = "User access should be editor or admin.";
+                    serviceResponse.MessageRu = "Пользователь должен быть Редактором или Администратором.";
                     return serviceResponse;
                 }
             }
@@ -151,6 +154,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "File is not found.";
+                serviceResponse.MessageRu = "Файл не найден.";
                 return serviceResponse;
             }
 
@@ -177,6 +181,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "User access should be editor or admin.";
+                serviceResponse.MessageRu = "Пользователь должен быть Редактором или Администратором.";
                 return serviceResponse;
             }
 
@@ -185,6 +190,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "Guide is not found.";
+                serviceResponse.MessageRu = "Гайд не найден.";
                 return serviceResponse;
             }
 
@@ -205,6 +211,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "User access should be editor or admin.";
+                serviceResponse.MessageRu = "Пользователь должен быть Редактором или Администратором.";
                 return serviceResponse;
             }
 
@@ -212,6 +219,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "File must be PNG image.";
+                serviceResponse.MessageRu = "Файл должен являться PNG изображением.";
                 return serviceResponse;
             }
 
@@ -225,6 +233,7 @@ namespace GuidesFusion360Server.Services
             serviceResponse.StatusCode = 201;
             serviceResponse.Data = guideId;
             serviceResponse.Message = "Guide is successfully created.";
+            serviceResponse.MessageRu = "Гайд успешно создан.";
             return serviceResponse;
         }
 
@@ -247,6 +256,8 @@ namespace GuidesFusion360Server.Services
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message =
                     "You should provide PDF or ZIP in file field or YouTube link in content field.";
+                serviceResponse.MessageRu =
+                    "В поле content необходимо ввести ссылку на YouTube видео или в поле file прикрепить PDF или ZIP файл.";
                 return serviceResponse;
             }
 
@@ -256,6 +267,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You should provide valid URL in link field.";
+                serviceResponse.MessageRu = "В поле link необходимо указать валидный URL адрес.";
                 return serviceResponse;
             }
 
@@ -267,6 +279,7 @@ namespace GuidesFusion360Server.Services
                 {
                     serviceResponse.StatusCode = 400;
                     serviceResponse.Message = "You should provide PDF or ZIP file.";
+                    serviceResponse.MessageRu = "Необходимо отправить PDF или ZIP файл.";
                     return serviceResponse;
                 }
 
@@ -274,6 +287,7 @@ namespace GuidesFusion360Server.Services
                 {
                     serviceResponse.StatusCode = 400;
                     serviceResponse.Message = "File with this name already exists in this guide.";
+                    serviceResponse.MessageRu = "Файл с таким именем уже существует.";
                     return serviceResponse;
                 }
 
@@ -286,6 +300,7 @@ namespace GuidesFusion360Server.Services
             serviceResponse.StatusCode = 201;
             serviceResponse.Data = partGuideId;
             serviceResponse.Message = "Part guide is successfully created.";
+            serviceResponse.MessageRu = "Гайд детали успешно создан.";
             return serviceResponse;
         }
 
@@ -332,12 +347,14 @@ namespace GuidesFusion360Server.Services
                 serviceResponse.StatusCode = 201;
                 serviceResponse.Data = model.GuideId;
                 serviceResponse.Message = "Model was converted to and saved as glb successfully.";
+                serviceResponse.MessageRu = "Модель была успешно конвертирована в glb и сохранена.";
                 return serviceResponse;
             }
             catch
             {
                 serviceResponse.StatusCode = 500;
                 serviceResponse.Message = "Unable to convert the model.";
+                serviceResponse.MessageRu = "Не удалось конвертировать модель.";
                 return serviceResponse;
             }
         }
@@ -359,6 +376,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "Hidden field should be true or false.";
+                serviceResponse.MessageRu = "В поле hidden необходимо указать true или false.";
                 return serviceResponse;
             }
 
@@ -368,6 +386,7 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = guideId;
             serviceResponse.Message = hidden == "true" ? "Guide is now hidden." : "Guide is now public.";
+            serviceResponse.MessageRu = hidden == "true" ? "Гайд был скрыт." : "Гайд был опубликован.";
             return serviceResponse;
         }
 
@@ -390,6 +409,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot provide file and content at the same time.";
+                serviceResponse.MessageRu = "Вы не можете заполнить поля file и content одновременно.";
                 return serviceResponse;
             }
 
@@ -399,6 +419,7 @@ namespace GuidesFusion360Server.Services
                 {
                     serviceResponse.StatusCode = 400;
                     serviceResponse.Message = "You should provide valid URL in content field.";
+                    serviceResponse.MessageRu = "Вы должны указать валидный URL в поле content.";
                     return serviceResponse;
                 }
 
@@ -418,6 +439,7 @@ namespace GuidesFusion360Server.Services
                 {
                     serviceResponse.StatusCode = 400;
                     serviceResponse.Message = "You should provide PDF or ZIP file or no files at all.";
+                    serviceResponse.MessageRu = "Вы должны загрузить PDF или ZIP файл или не загружать файл вовсе.";
                     return serviceResponse;
                 }
 
@@ -427,6 +449,7 @@ namespace GuidesFusion360Server.Services
                     {
                         serviceResponse.StatusCode = 400;
                         serviceResponse.Message = "File with this name already exists in this guide.";
+                        serviceResponse.MessageRu = "Файл с таким именем уже существует в данном гайде.";
                         return serviceResponse;
                     }
 
@@ -451,6 +474,7 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = partGuide.Id;
             serviceResponse.Message = "Part guide is successfully updated.";
+            serviceResponse.MessageRu = "Гайд детали успешно обновлен.";
             return serviceResponse;
         }
 
@@ -471,6 +495,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "Part guide with this id was not found";
+                serviceResponse.MessageRu = "Гайд детали с таким id не был найден.";
                 return serviceResponse;
             }
 
@@ -478,6 +503,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "Part guides should be from one guide.";
+                serviceResponse.MessageRu = "Гайды детали должны принадлежать одному гайду.";
                 return serviceResponse;
             }
 
@@ -488,6 +514,7 @@ namespace GuidesFusion360Server.Services
             await _guidesRepository.UpdatePartGuides(new List<PartGuide> {partGuide1, partGuide2});
 
             serviceResponse.Message = "Part guides are switched successfully.";
+            serviceResponse.MessageRu = "Гайды детали успешно поменялись местами.";
             return serviceResponse;
         }
 
@@ -509,6 +536,7 @@ namespace GuidesFusion360Server.Services
             await _guidesRepository.RemoveGuide(guide);
 
             serviceResponse.Message = "Guide is deleted successfully.";
+            serviceResponse.MessageRu = "Гайд удален успешно.";
             return serviceResponse;
         }
 
@@ -528,6 +556,7 @@ namespace GuidesFusion360Server.Services
             await _guidesRepository.RemovePartGuide(partGuide);
 
             serviceResponse.Message = "Part guide is deleted successfully.";
+            serviceResponse.MessageRu = "Гайд детали удален успешно.";
             return serviceResponse;
         }
 
@@ -542,6 +571,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "Guide with this id was not found.";
+                serviceResponse.MessageRu = "Гайд с таким id не найден.";
                 return new Tuple<bool, ServiceResponse<T>, Guide>(false, serviceResponse, null);
             }
 
@@ -549,6 +579,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "Guide with this id is not public.";
+                serviceResponse.MessageRu = "Гайд с таким id скрыт.";
                 return new Tuple<bool, ServiceResponse<T>, Guide>(false, serviceResponse, guide);
             }
 
@@ -567,6 +598,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "Guide with this id was not found.";
+                serviceResponse.MessageRu = "Гайд с таким id не найден.";
                 return new Tuple<bool, ServiceResponse<T>, Guide>(false, serviceResponse, null);
             }
 
@@ -577,7 +609,9 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message =
-                    $"User access should be {(requiresAdminAccess ? "admin." : "editor or admin.")}";
+                    $"User access should be {(requiresAdminAccess ? "admin" : "editor or admin")}.";
+                serviceResponse.MessageRu =
+                    $"Пользователь должен быть {(requiresAdminAccess ? "Администратором" : "Редактором или Администратором")}.";
                 return new Tuple<bool, ServiceResponse<T>, Guide>(false, serviceResponse, guide);
             }
 
@@ -585,6 +619,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "Guide should be hidden in order to edit it.";
+                serviceResponse.MessageRu = "Чтобы редактировать гайд, его нужно скрыть.";
                 return new Tuple<bool, ServiceResponse<T>, Guide>(false, serviceResponse, guide);
             }
 
@@ -607,6 +642,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "Part guide with this id was not found.";
+                serviceResponse.MessageRu = "Гайд детали с таким id не найден.";
                 return new Tuple<bool, ServiceResponse<T>, PartGuide>(false, serviceResponse, null);
             }
 

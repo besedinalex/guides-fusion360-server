@@ -66,6 +66,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User with given id was not found.";
+                serviceResponse.MessageRu = "Пользователь с таким id не найден.";
                 return serviceResponse;
             }
 
@@ -82,7 +83,8 @@ namespace GuidesFusion360Server.Services
             if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 serviceResponse.StatusCode = 404;
-                serviceResponse.Message = "User with given email or password was not found.";
+                serviceResponse.Message = "User with given email and password was not found.";
+                serviceResponse.MessageRu = "Пользователь с указанными email и паролем не найден.";
                 return serviceResponse;
             }
 
@@ -97,8 +99,9 @@ namespace GuidesFusion360Server.Services
 
             if (await _usersRepository.UserExists(userData.Email))
             {
-                serviceResponse.StatusCode = 404;
+                serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "User with this email already exists.";
+                serviceResponse.MessageRu = "Пользователь с таким email уже существует.";
                 return serviceResponse;
             }
 
@@ -119,6 +122,7 @@ namespace GuidesFusion360Server.Services
             serviceResponse.StatusCode = 201;
             serviceResponse.Data = CreateToken(userId, user.Email);
             serviceResponse.Message = "User is created successfully.";
+            serviceResponse.MessageRu = "Пользователь успешно создан.";
             return serviceResponse;
         }
 
@@ -133,6 +137,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "Restore code is not found.";
+                serviceResponse.MessageRu = "Код восстановления не найден.";
                 return serviceResponse;
             }
 
@@ -141,6 +146,7 @@ namespace GuidesFusion360Server.Services
                 RestorePasswordCodes.Remove(restoreData);
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "Restore code is expired.";
+                serviceResponse.MessageRu = "Код восстановления истек.";
                 return serviceResponse;
             }
 
@@ -150,6 +156,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot use the same password.";
+                serviceResponse.MessageRu = "Вы не можете использовать тот же пароль.";
                 return serviceResponse;
             }
 
@@ -164,6 +171,7 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = CreateToken(user.Id, user.Email);
             serviceResponse.Message = "Password changed successfully.";
+            serviceResponse.MessageRu = "Пароль успешно обновлен.";
             return serviceResponse;
         }
 
@@ -200,6 +208,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
+                serviceResponse.MessageRu = "Пользователь не найден.";
                 return serviceResponse;
             }
 
@@ -225,6 +234,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
+                serviceResponse.MessageRu = "Пользователь не найден.";
                 return serviceResponse;
             }
 
@@ -242,6 +252,7 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = restoreCode;
             serviceResponse.Message = "Send this restore code to the user.";
+            serviceResponse.MessageRu = "Сообщите этот код восстановления пользователю.";
             return serviceResponse;
         }
 
@@ -260,6 +271,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "New access should be 'unknown' or 'editor'.";
+                serviceResponse.MessageRu = "Новый уровень доступа должен быть 'unknown' или 'editor'.";
                 return serviceResponse;
             }
 
@@ -269,6 +281,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
+                serviceResponse.MessageRu = "Пользователь не найден.";
                 return serviceResponse;
             }
 
@@ -276,6 +289,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot change access level for yourself.";
+                serviceResponse.MessageRu = "Нельзя изменить уровень доступа самому себе.";
                 return serviceResponse;
             }
 
@@ -283,6 +297,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot change access level of another admin.";
+                serviceResponse.MessageRu = "Нельзя изменить уровень доступа другому администатору.";
                 return serviceResponse;
             }
 
@@ -291,6 +306,7 @@ namespace GuidesFusion360Server.Services
 
             serviceResponse.Data = access;
             serviceResponse.Message = "New access level is set.";
+            serviceResponse.MessageRu = "Новый уровень доступа установлен.";
             return serviceResponse;
         }
 
@@ -312,6 +328,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 404;
                 serviceResponse.Message = "User is not found.";
+                serviceResponse.MessageRu = "Пользователь не найден.";
                 return serviceResponse;
             }
 
@@ -319,6 +336,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot delete yourself.";
+                serviceResponse.MessageRu = "Вы не можете удалить самого себя.";
                 return serviceResponse;
             }
 
@@ -326,6 +344,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "You cannot delete another admin.";
+                serviceResponse.MessageRu = "Нельзя удалить другого администратора.";
                 return serviceResponse;
             }
 
@@ -338,7 +357,8 @@ namespace GuidesFusion360Server.Services
             await _usersRepository.RemoveUser(user);
 
             serviceResponse.Data = userGuides.Count;
-            serviceResponse.Message = "User is removed";
+            serviceResponse.Message = "User is removed.";
+            serviceResponse.MessageRu = "Пользователь удален.";
             return serviceResponse;
         }
 
@@ -353,6 +373,7 @@ namespace GuidesFusion360Server.Services
             {
                 serviceResponse.StatusCode = 401;
                 serviceResponse.Message = "User should be an admin to make a such request.";
+                serviceResponse.MessageRu = "Пользователь должен быть Редактором или Администратором.";
                 return new Tuple<bool, ServiceResponse<T>>(false, serviceResponse);
             }
 

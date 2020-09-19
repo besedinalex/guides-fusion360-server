@@ -15,22 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Storage\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Remove="Storage\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Storage\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Remove="Storage\**" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="wwwroot" />
     </ItemGroup>
 
