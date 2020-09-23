@@ -240,7 +240,7 @@ namespace GuidesFusion360Server.Services
         /// <inheritdoc />
         public async Task<ServiceResponse<int>> CreatePartGuide(AddPartGuideDto newPartGuide)
         {
-            var (isEditable, accessResponse, guide) = await GuideIsEditable<int>(newPartGuide.GuideId);
+            var (isEditable, accessResponse, guide) = await GuideIsEditable<int>((int) newPartGuide.GuideId!);
             if (!isEditable)
             {
                 return accessResponse;
@@ -307,7 +307,8 @@ namespace GuidesFusion360Server.Services
         /// <inheritdoc />
         public async Task<ServiceResponse<int>> UploadModel(AddGuideModelDto model)
         {
-            var (isEditable, accessResponse, guide) = await GuideIsEditable<int>(model.GuideId);
+            var guideId = (int) model.GuideId!;
+            var (isEditable, accessResponse, guide) = await GuideIsEditable<int>(guideId);
             if (!isEditable)
             {
                 return accessResponse;
@@ -342,10 +343,10 @@ namespace GuidesFusion360Server.Services
                 var data = JObject.Parse(await response.Content.ReadAsStringAsync());
                 var glbModel = Convert.FromBase64String(data["output"].ToString());
 
-                await _fileManager.SaveFile(model.GuideId, "model.glb", glbModel);
+                await _fileManager.SaveFile(guideId, "model.glb", glbModel);
 
                 serviceResponse.StatusCode = 201;
-                serviceResponse.Data = model.GuideId;
+                serviceResponse.Data = guideId;
                 serviceResponse.Message = "Model was converted to and saved as glb successfully.";
                 serviceResponse.MessageRu = "Модель была успешно конвертирована в glb и сохранена.";
                 return serviceResponse;

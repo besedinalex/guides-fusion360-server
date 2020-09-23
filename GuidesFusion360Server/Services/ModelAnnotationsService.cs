@@ -86,7 +86,8 @@ namespace GuidesFusion360Server.Services
         /// <inheritdoc />
         public async Task<ServiceResponse<int>> AddModelAnnotation(AddModelAnnotationDto newAnnotation)
         {
-            var (isEditable, accessResponse, guide) = await _guidesService.GuideIsEditable<int>(newAnnotation.GuideId);
+            var (isEditable, accessResponse, guide) =
+                await _guidesService.GuideIsEditable<int>((int) newAnnotation.GuideId!);
             if (!isEditable)
             {
                 return accessResponse;

@@ -43,7 +43,7 @@ namespace GuidesFusion360Server
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IFileManager, FileManager>();
+            services.AddScoped<IFileManager, FileManager>();
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IGuidesRepository, GuidesRepository>();
