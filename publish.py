@@ -43,7 +43,7 @@ call(command, shell=True, cwd='./GuidesFusion360Server')
 
 if path.isdir('./Fusion360Guide'):
     rmtree('./Fusion360Guide')
-build = './GuidesFusion360Server/bin/Release/netcoreapp3.1/{}publish'.format('' if os == None else '{}-x64/'.format(os))
+build = './GuidesFusion360Server/bin/Release/net5.0/{}publish'.format('' if os == None else '{}-x64/'.format(os))
 copy_tree(build, './Fusion360Guide')
 
 print('\nBuilding is finished and is available in /Fusion360Guide.\n')
